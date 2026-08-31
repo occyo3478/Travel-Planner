@@ -909,6 +909,232 @@ body {
     font-size: 1.1rem;
 }
 
+
 @media (max-width: 768px) {
-    /* 모바일 수정 */
+
+    body {
+        height: auto;
+        min-height: 100vh;
+        overflow: auto;
+    }
+
+    /* =========================
+       메인 페이지
+       ========================= */
+
+    .app-container {
+        flex-direction: column;
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .sidebar {
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+        padding: 1rem;
+    }
+
+    .logo-area {
+        margin-bottom: 1rem;
+    }
+
+    .places-section {
+        overflow: visible;
+    }
+
+    .sidebar-actions {
+        margin-top: 1rem;
+    }
+
+    .trip-stats {
+        margin-top: 1rem;
+    }
+
+    .main-content {
+        width: 100%;
+        overflow: visible;
+    }
+
+    .top-bar {
+        height: auto;
+        min-height: 70px;
+        padding: 1rem;
+    }
+
+    .user-welcome h2 {
+        font-size: 1rem;
+    }
+
+    .user-welcome p {
+        font-size: 0.75rem;
+    }
+
+    .actions {
+        gap: 0.25rem;
+    }
+
+    .content-area {
+        padding: 1rem;
+        overflow: visible;
+    }
+
+    .section-header {
+        align-items: flex-start;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .tab-container {
+        gap: 0.75rem;
+    }
+
+    .tab-btn {
+        font-size: 0.9rem;
+    }
+
+    .view-options {
+        margin-left: auto;
+    }
+
+    .trip-card {
+        padding: 1rem;
+    }
+
+    .trip-info {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.35rem;
+    }
+
+    .trip-info h3 {
+        font-size: 1rem;
+    }
+
+    .trip-info p {
+        font-size: 0.8rem;
+    }
+
+    /* 캘린더 */
+
+    .calendar-view-container {
+        height: auto;
+        min-height: 500px;
+        padding: 0.75rem;
+        overflow-x: auto;
+    }
+
+    .calendar-day {
+        min-height: 60px;
+        padding: 0.25rem;
+        font-size: 0.75rem;
+    }
+
+    .trip-label {
+        font-size: 0.6rem;
+        padding: 2px 3px;
+    }
+
+    /* 알림 */
+
+    .notification-dropdown {
+        position: fixed;
+        top: 70px;
+        right: 1rem;
+        left: 1rem;
+        width: auto;
+    }
+
+
+    /* =========================
+       여행 상세 페이지
+       ========================= */
+
+    .detail-page-container {
+        flex-direction: column;
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .detail-sidebar {
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .detail-header {
+        padding: 1rem;
+    }
+
+    .detail-sidebar .places-section {
+        padding: 1rem;
+        max-height: none;
+        overflow: visible;
+    }
+
+    .places-list {
+        max-height: 350px;
+        overflow-y: auto;
+    }
+
+    .map-container {
+        width: 100%;
+        height: 450px;
+        min-height: 450px;
+    }
+
+    #map {
+        width: 100%;
+        height: 100%;
+    }
+
+
+    /* =========================
+       여행 추가 페이지
+       ========================= */
+
+    .add-page-container {
+        padding: 1rem;
+        justify-content: flex-start;
+        padding-top: 2rem;
+    }
+
+    .add-page-header {
+        margin-bottom: 1.5rem;
+    }
+
+    .add-page-header h1 {
+        font-size: 1.4rem;
+    }
+
+    .add-page-header .back-link {
+        position: static;
+        display: flex;
+        margin-bottom: 1rem;
+    }
+
+    .add-form-container {
+        padding: 1.5rem;
+        border-radius: 0.75rem;
+    }
+
+    .date-range-group {
+        gap: 0.5rem;
+    }
+
+    .date-separator {
+        padding-bottom: 0.75rem;
+    }
+
+
+    /* =========================
+       프로필
+       ========================= */
+
+    .profile-dropdown {
+        right: 0;
+        width: 200px;
+    }
 }
