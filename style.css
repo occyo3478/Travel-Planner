@@ -1174,3 +1174,9 @@ body {
         color: var(--primary-color);
     }
 }
+
+@media (max-width: 768px) {
+    .sidebar .logo-area {
+        display: none;
+    }
+}
