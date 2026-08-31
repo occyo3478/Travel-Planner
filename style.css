@@ -1150,3 +1150,27 @@ body {
         width: 200px;
     }
 }
+
+.mobile-logo {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .mobile-logo {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--text-main);
+    }
+
+    .mobile-logo i {
+        color: var(--primary-color);
+        font-size: 1.4rem;
+    }
+
+    .mobile-logo span span {
+        color: var(--primary-color);
+    }
+}
