@@ -23,120 +23,123 @@
         <!-- Sidebar / Navigation -->
         <aside class="sidebar">
 
-
-<div class="mobile-welcome">
-    <h2>반갑습니다, 여행자님! 👋</h2>
-    <p>다음 여행을 계획해보세요.</p>
-</div>
-
-<div class="places-section">
-
-    <div class="places-section">
-        <div class="input-group period-search-group">
-            <label>여행지 검색</label>
-            <input type="text" id="search-name" placeholder="여행지 이름 검색">
-        </div>
-
-        <div class="input-group period-search-group">
-            <label>기간 검색</label>
-            <div class="date-filter-group">
-                <select id="search-year">
-                    <option value="">년도 선택</option>
-                </select>
-                <select id="search-month">
-                    <option value="">월 선택</option>
-                    <option value="1">1월</option>
-                    <option value="2">2월</option>
-                    <option value="3">3월</option>
-                    <option value="4">4월</option>
-                    <option value="5">5월</option>
-                    <option value="6">6월</option>
-                    <option value="7">7월</option>
-                    <option value="8">8월</option>
-                    <option value="9">9월</option>
-                    <option value="10">10월</option>
-                    <option value="11">11월</option>
-                    <option value="12">12월</option>
-                </select>
+            <!-- PC용 로고 -->
+            <div class="logo-area">
+                <i class="fa-solid fa-plane-departure logo-icon"></i>
+                <h1>Travel<span class="highlight">Planner</span></h1>
             </div>
-        </div>
 
-        <button id="search-btn" class="btn-secondary">
-            <i class="fa-solid fa-magnifying-glass"></i> 검색하기
-        </button>
-    </div>
+            <div class="mobile-welcome">
+                <h2>반갑습니다, 여행자님! 👋</h2>
+                <p>다음 여행을 계획해보세요.</p>
+            </div>
 
-    <div class="sidebar-actions">
-        <a href="add.html" class="btn-primary">
-            <i class="fa-solid fa-plus"></i> 새로운 일정 만들기
-        </a>
-    </div>
+            <div class="places-section">
+                <div class="input-group period-search-group">
+                    <label>여행지 검색</label>
+                    <input type="text" id="search-name" placeholder="여행지 이름 검색">
+                </div>
 
-    <div class="trip-stats">
-        <div class="stat-card">
-            <span class="stat-number" id="total-trips">0</span>
-            <span class="stat-label">계획된 여행</span>
-        </div>
-        <div class="stat-card">
-            <span class="stat-number" id="upcoming-trips">0</span>
-            <span class="stat-label">다가오는 일정</span>
-        </div>
-        <div class="stat-card">
-            <span class="stat-number" id="past-trips">0</span>
-            <span class="stat-label">지난 여행</span>
-        </div>
-    </div>
+                <div class="input-group period-search-group">
+                    <label>기간 검색</label>
+                    <div class="date-filter-group">
+                        <select id="search-year">
+                            <option value="">년도 선택</option>
+                        </select>
+                        <select id="search-month">
+                            <option value="">월 선택</option>
+                            <option value="1">1월</option>
+                            <option value="2">2월</option>
+                            <option value="3">3월</option>
+                            <option value="4">4월</option>
+                            <option value="5">5월</option>
+                            <option value="6">6월</option>
+                            <option value="7">7월</option>
+                            <option value="8">8월</option>
+                            <option value="9">9월</option>
+                            <option value="10">10월</option>
+                            <option value="11">11월</option>
+                            <option value="12">12월</option>
+                        </select>
+                    </div>
+                </div>
 
-</aside>
-
-<main class="main-content">
-
-    <header class="top-bar">
-        <div class="mobile-logo">
-        <i class="fa-solid fa-plane-departure"></i>
-        <span>Travel<span>Planner</span></span>
-    </div>
-
-        
-
-        <div class="actions">
-            <div class="notification-container">
-                <button class="btn-icon" id="notification-btn">
-                    <i class="fa-regular fa-bell"></i>
+                <button id="search-btn" class="btn-secondary">
+                    <i class="fa-solid fa-magnifying-glass"></i> 검색하기
                 </button>
+            </div>
 
-                <div class="notification-dropdown" id="notification-dropdown">
-                    <div class="notification-header">알림</div>
-                    <ul class="notification-list" id="notification-list">
-                        <li class="empty-noti">새로운 알림이 없습니다.</li>
-                    </ul>
+            <div class="sidebar-actions">
+                <a href="add.html" class="btn-primary">
+                    <i class="fa-solid fa-plus"></i> 새로운 일정 만들기
+                </a>
+            </div>
+
+            <div class="trip-stats">
+                <div class="stat-card">
+                    <span class="stat-number" id="total-trips">0</span>
+                    <span class="stat-label">계획된 여행</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="upcoming-trips">0</span>
+                    <span class="stat-label">다가오는 일정</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="past-trips">0</span>
+                    <span class="stat-label">지난 여행</span>
                 </div>
             </div>
 
-            <div class="user-profile" id="profile-btn">
-                <img src="https://ui-avatars.com/api/?name=Traveler&background=0D8ABC&color=fff" alt="User">
+        </aside>
 
-                <div class="profile-dropdown" id="profile-dropdown">
-                    <div class="profile-header">
-                        <strong>Traveler</strong>
-                        <span>traveler@example.com</span>
+        <main class="main-content">
+
+            <header class="top-bar">
+                <div class="mobile-logo">
+                    <i class="fa-solid fa-plane-departure"></i>
+                    <span>Travel<span>Planner</span></span>
+                </div>
+
+
+
+                <div class="actions">
+                    <div class="notification-container">
+                        <button class="btn-icon" id="notification-btn">
+                            <i class="fa-regular fa-bell"></i>
+                        </button>
+
+                        <div class="notification-dropdown" id="notification-dropdown">
+                            <div class="notification-header">알림</div>
+                            <ul class="notification-list" id="notification-list">
+                                <li class="empty-noti">새로운 알림이 없습니다.</li>
+                            </ul>
+                        </div>
                     </div>
 
-                    <ul class="profile-menu">
-                        <li><a href="#"><i class="fa-regular fa-user"></i> 내 프로필</a></li>
-                        <li><a href="#"><i class="fa-solid fa-gear"></i> 설정</a></li>
-                        <li class="divider"></li>
-                        <li>
-                            <a href="#" class="text-danger">
-                                <i class="fa-solid fa-arrow-right-from-bracket"></i> 로그아웃
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
+                    <div class="user-profile" id="profile-btn">
+                        <img src="https://ui-avatars.com/api/?name=Traveler&background=0D8ABC&color=fff" alt="User">
 
-    </header>
+                        <div class="profile-dropdown" id="profile-dropdown">
+                            <div class="profile-header">
+                                <strong>Traveler</strong>
+                                <span>traveler@example.com</span>
+                            </div>
+
+                            <ul class="profile-menu">
+                                <li><a href="#"><i class="fa-regular fa-user"></i> 내 프로필</a></li>
+                                <li><a href="#"><i class="fa-solid fa-gear"></i> 설정</a></li>
+                                <li class="divider"></li>
+                                <li>
+                                    <a href="#" class="text-danger">
+                                        <i class="fa-solid fa-arrow-right-from-bracket"></i> 로그아웃
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            </header>
 
             <section class="content-area">
                 <div class="section-header">
