@@ -255,12 +255,12 @@ loadTrips().then(() => {
                         <i class="fa-solid fa-trash"></i>
                     </button>
                 `;
-                card.onclick = (e) => {
-                    // Prevent navigation if delete button was clicked (though stopPropagation handles it, this is extra safety)
-                    if (!e.target.closest('.delete-trip-btn')) {
-                        goToDetail(trip.id);
-                    }
-                };
+                card.addEventListener('click', (e) => {
+    if (e.target.closest('.delete-trip-btn')) return;
+
+    console.log("클릭한 여행 ID:", trip.id);
+    goToDetail(trip.id);
+});
                 tripList.appendChild(card);
             });
         }
@@ -738,6 +738,7 @@ function initAddPage() {
 }
 
     function goToDetail(id) {
-        window.location.href = `trip_detail.html?id=${id}`;
-    }
+    console.log("상세 페이지 이동:", id);
+    window.location.href = `trip_detail.html?id=${encodeURIComponent(String(id))}`;
+}
 });
