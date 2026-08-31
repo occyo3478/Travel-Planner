@@ -343,7 +343,7 @@ loadTrips().then(() => {
         const endDateInput = document.getElementById('end-date');
         const activityInput = document.getElementById('activity');
 
-        addBtn.addEventListener('click', () => {
+        addBtn.addEventListener('click', async () => {
             const destination = destinationInput.value;
             const startDate = startDateInput.value;
             const endDate = endDateInput.value;
@@ -364,8 +364,8 @@ loadTrips().then(() => {
             };
 
             trips.push(newTrip);
-            saveTrips();
-            window.location.href = 'index.html';
+await saveTrips();
+window.location.href = 'index.html';
         });
     }
 
@@ -686,9 +686,41 @@ loadTrips().then(() => {
     }
 
 
-    function saveTrips() {
-        localStorage.setItem('travelTrips', JSON.stringify(trips));
+    async function saveTrips() {
+    try {
+        const batch = db.batch();
+
+        // Firestore에 있는 기존 여행 데이터 가져오기
+        const snapshot = await db.collection('trips').get();
+
+        // 기존 데이터 삭제
+        snapshot.docs.forEach(doc => {
+            batch.delete(doc.ref);
+        });
+
+        // 현재 trips를 Firestore에 저장
+        trips.forEach(t => {
+            const docRef = db.collection('trips').doc(String(t.id));
+
+            batch.set(docRef, {
+                id: t.id,
+                destination: t.destination,
+                startDate: t.startDate,
+                endDate: t.endDate,
+                activity: t.activity || '',
+                places: t.places || []
+            });
+        });
+
+        await batch.commit();
+
+        console.log('Firestore 저장 완료');
+
+    } catch (error) {
+        console.error('Firestore 저장 실패:', error);
+        alert('여행 일정 저장에 실패했습니다.');
     }
+}
 
     function goToDetail(id) {
         window.location.href = `trip_detail.html?id=${id}`;
