@@ -1,34 +1,22 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
-import {
-    getFirestore,
-    collection,
-    getDocs,
-    addDoc,
-    deleteDoc,
-    doc,
-    updateDoc
-} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyDqAZiiw7SKc4SLSsWug1G3e_f5-u-pkYw",
-    authDomain: "travel-planner-a9d51.firebaseapp.com",
-    projectId: "travel-planner-a9d51",
-    storageBucket: "travel-planner-a9d51.firebasestorage.app",
-    messagingSenderId: "966221614343",
-    appId: "1:966221614343:web:f48783ed75140a8be589a2",
-    measurementId: "G-6RSREEXYS4"
+  apiKey: "AIzaSyDqAZiiw7SKc4SLSsWug1G3e_f5-u-pkYw",
+  authDomain: "travel-planner-a9d51.firebaseapp.com",
+  projectId: "travel-planner-a9d51",
+  storageBucket: "travel-planner-a9d51.firebasestorage.app",
+  messagingSenderId: "966221614343",
+  appId: "1:966221614343:web:f48783ed75140a8be589a2",
+  measurementId: "G-6RSREEXYS4"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 document.addEventListener('DOMContentLoaded', () => {
-
-
-    
     // State
-    //let trips = JSON.parse(localStorage.getItem('travelTrips')) || [];
-    let trips = [];
+    let trips = JSON.parse(localStorage.getItem('travelTrips')) || [];
     let currentTab = 'upcoming'; // 'upcoming' or 'past'
     let trip = {}; // Current trip for detail page
 
@@ -76,14 +64,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         searchYearSelect.value = "";
 
-        // // Initial Render
-        // renderTrips();
-        // updateStats();
         // Initial Render
-        loadTrips().then(() => {
-            renderTrips();
-            updateStats();
-        });
+        renderTrips();
+        updateStats();
 
         // Event Listeners
         tabBtns.forEach(btn => {
@@ -279,7 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <h3>${trip.destination}</h3>
                         <p>${trip.startDate} ~ ${trip.endDate}</p>
                     </div>
-                    <button class="delete-trip-btn" onclick="deleteTrip('${trip.id}', event)">
+                    <button class="delete-trip-btn" onclick="deleteTrip(${trip.id}, event)">
                         <i class="fa-solid fa-trash"></i>
                     </button>
                 `;
@@ -293,25 +276,13 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        window.deleteTrip = async function (id, event) {
-            event.stopPropagation();
-        
-            if (!confirm('정말 이 여행 일정을 삭제하시겠습니까?')) {
-                return;
-            }
-        
-            try {
-                await deleteDoc(doc(db, "trips", id));
-        
+        window.deleteTrip = function (id, event) {
+            event.stopPropagation(); // Prevent card click
+            if (confirm('정말 이 여행 일정을 삭제하시겠습니까?')) {
                 trips = trips.filter(t => t.id !== id);
-        
+                saveTrips();
                 renderTrips();
                 updateStats();
-        
-                alert('여행 일정이 삭제되었습니다.');
-            } catch (error) {
-                console.error("여행 일정 삭제 오류:", error);
-                alert('여행 일정 삭제 중 오류가 발생했습니다.');
             }
         };
 
@@ -385,7 +356,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const endDateInput = document.getElementById('end-date');
         const activityInput = document.getElementById('activity');
 
-        addBtn.addEventListener('click', async () => {
+        addBtn.addEventListener('click', () => {
             const destination = destinationInput.value;
             const startDate = startDateInput.value;
             const endDate = endDateInput.value;
@@ -406,45 +377,30 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             trips.push(newTrip);
-            await saveTrips();
+            saveTrips();
             window.location.href = 'index.html';
         });
     }
 
     // Detail Page Logic
-    // Detail Page Logic
-async function initDetailPage() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const tripId = urlParams.get('id');
+    function initDetailPage() {
+        // Mock getting trip ID from URL (or just use latest for demo if no ID)
+        // In real app, parse URL params. Here we'll just pick the first one or a dummy.
+        // But wait, goToDetail sets a param? No, it just navigates.
+        // Let's assume we store 'currentTripId' in localStorage for simplicity or parse query.
+        const urlParams = new URLSearchParams(window.location.search);
+        const tripId = parseInt(urlParams.get('id'));
 
-    try {
-        const tripDoc = await getDocs(collection(db, "trips"));
+        trip = trips.find(t => t.id === tripId) || trips[0];
 
-        const found = tripDoc.docs.find(docSnapshot => docSnapshot.id === tripId);
-
-        if (!found) {
+        if (!trip) {
             alert('여행 정보를 찾을 수 없습니다.');
             window.location.href = 'index.html';
             return;
         }
 
-        trip = {
-            id: found.id,
-            ...found.data()
-        };
-
-        trips = [trip];
-
-    } catch (error) {
-        console.error("여행 정보 불러오기 오류:", error);
-        alert('여행 정보를 불러오는 중 오류가 발생했습니다.');
-        window.location.href = 'index.html';
-        return;
-    }
-
-    // 여기부터는 기존 코드 그대로
-    document.getElementById('trip-title').textContent = trip.destination;
-    document.getElementById('trip-dates').textContent = `${trip.startDate} ~ ${trip.endDate}`;
+        document.getElementById('trip-title').textContent = trip.destination;
+        document.getElementById('trip-dates').textContent = `${trip.startDate} ~ ${trip.endDate}`;
 
         const map = L.map('map').setView([37.5665, 126.9780], 10); // Default Seoul
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
@@ -456,55 +412,37 @@ async function initDetailPage() {
 
         renderPlaces();
 
-        addPlaceBtn.addEventListener('click', async () => {
+        addPlaceBtn.addEventListener('click', () => {
             const placeName = placeInput.value.trim();
-
             if (!placeName) return;
 
-            try {
-                // 장소 검색
-                const response = await fetch(
-                    `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(placeName)}`
-                );
+            // Use Nominatim API for geocoding
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(placeName)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.length > 0) {
+                        const result = data[0];
+                        const newPlace = {
+                            id: Date.now(),
+                            name: placeName, // Or use result.display_name
+                            lat: parseFloat(result.lat),
+                            lng: parseFloat(result.lon),
+                            isLocked: false // Default unlocked
+                        };
 
-                const data = await response.json();
-
-                if (!data || data.length === 0) {
-                    alert('장소를 찾을 수 없습니다.');
-                    return;
-                }
-
-                const result = data[0];
-
-                const newPlace = {
-                    id: Date.now(),
-                    name: placeName,
-                    lat: parseFloat(result.lat),
-                    lng: parseFloat(result.lon),
-                    isLocked: false
-                };
-
-                if (!trip.places) {
-                    trip.places = [];
-                }
-
-                // 장소 추가
-                trip.places.push(newPlace);
-
-                // Firestore에 저장
-                await saveTrips();
-
-                // 화면 갱신
-                renderPlaces();
-
-                placeInput.value = '';
-
-                console.log('장소 저장 완료:', newPlace);
-
-            } catch (error) {
-                console.error('장소 추가 오류:', error);
-                alert('장소 추가 중 오류가 발생했습니다.');
-            }
+                        if (!trip.places) trip.places = [];
+                        trip.places.push(newPlace);
+                        saveTrips();
+                        renderPlaces();
+                        placeInput.value = '';
+                    } else {
+                        alert('장소를 찾을 수 없습니다.');
+                    }
+                })
+                .catch(err => {
+                    console.error('Geocoding error:', err);
+                    alert('장소 검색 중 오류가 발생했습니다.');
+                });
         });
 
         optimizeBtn.addEventListener('click', () => {
@@ -614,7 +552,7 @@ async function initDetailPage() {
             // Calculate Total Distance
             const distKm = (bestDist / 1000).toFixed(1);
 
-            place.isLocked = !place.isLocked;
+            trip.places = finalFullRoute;
             saveTrips();
             renderPlaces();
 
@@ -625,12 +563,11 @@ async function initDetailPage() {
             }
         });
 
-        window.toggleLock = async function (id) {
+        window.toggleLock = function (id) {
             const place = trip.places.find(p => p.id === id);
-        
             if (place) {
                 place.isLocked = !place.isLocked;
-                await saveTrips();
+                saveTrips();
                 renderPlaces();
             }
         };
@@ -738,75 +675,15 @@ async function initDetailPage() {
             });
         }
 
-        window.removePlace = async function (id) {
-            if (!confirm('이 장소를 삭제하시겠습니까?')) {
-                return;
-            }
-        
-            try {
-                trip.places = trip.places.filter(p => p.id !== id);
-        
-                await saveTrips();
-        
-                renderPlaces();
-        
-                console.log('장소 삭제 완료');
-            } catch (error) {
-                console.error('장소 삭제 오류:', error);
-                alert('장소 삭제 중 오류가 발생했습니다.');
-            }
+        window.removePlace = function (id) {
+            trip.places = trip.places.filter(p => p.id !== id);
+            saveTrips();
+            renderPlaces();
         };
     }
 
-    async function loadTrips() {
-        try {
-            const querySnapshot = await getDocs(collection(db, "trips"));
-    
-            trips = [];
-    
-            querySnapshot.forEach((docSnapshot) => {
-                trips.push({
-                    id: docSnapshot.id,
-                    ...docSnapshot.data()
-                });
-            });
-    
-            console.log("Firestore에서 일정 불러오기 완료:", trips);
-        } catch (error) {
-            console.error("Firestore 불러오기 오류:", error);
-            alert("여행 일정을 불러오는 중 오류가 발생했습니다.");
-        }
-    }
-
-    async function saveTrips() {
-        try {
-            for (const trip of trips) {
-                if (trip.id && typeof trip.id === 'string') {
-                    await updateDoc(doc(db, "trips", trip.id), {
-                        destination: trip.destination,
-                        startDate: trip.startDate,
-                        endDate: trip.endDate,
-                        activity: trip.activity,
-                        places: trip.places || []
-                    });
-                } else {
-                    const docRef = await addDoc(collection(db, "trips"), {
-                        destination: trip.destination,
-                        startDate: trip.startDate,
-                        endDate: trip.endDate,
-                        activity: trip.activity,
-                        places: trip.places || []
-                    });
-    
-                    trip.id = docRef.id;
-                }
-            }
-    
-            console.log("Firestore 저장 완료");
-        } catch (error) {
-            console.error("Firestore 저장 오류:", error);
-            alert("여행 일정 저장 중 오류가 발생했습니다.");
-        }
+    function saveTrips() {
+        localStorage.setItem('travelTrips', JSON.stringify(trips));
     }
 
     function goToDetail(id) {
