@@ -669,6 +669,23 @@ loadTrips().then(() => {
         };
     }
 
+        async function loadTrips() {
+        try {
+            const snapshot = await db.collection('trips').get();
+
+            trips = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+
+            console.log('Firestore에서 불러온 일정:', trips);
+        } catch (error) {
+            console.error('일정 불러오기 실패:', error);
+            trips = [];
+        }
+    }
+
+
     function saveTrips() {
         localStorage.setItem('travelTrips', JSON.stringify(trips));
     }
