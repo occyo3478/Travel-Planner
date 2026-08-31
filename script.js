@@ -343,7 +343,7 @@ loadTrips().then(() => {
         const endDateInput = document.getElementById('end-date');
         const activityInput = document.getElementById('activity');
 
-        addBtn.addEventListener('click', () => {
+        addBtn.addEventListener('click', async () => {
             const destination = destinationInput.value;
             const startDate = startDateInput.value;
             const endDate = endDateInput.value;
@@ -364,9 +364,10 @@ loadTrips().then(() => {
             };
 
             trips.push(newTrip);
-saveTrips();
+await saveTrips();
 window.location.href = 'index.html';
-        });
+});
+
     }
 
     // Detail Page Logic
