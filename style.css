@@ -32,7 +32,10 @@ body {
     height: 100vh;
 }
 
-/* Sidebar */
+/* =========================================================
+   Sidebar
+   ========================================================= */
+
 .sidebar {
     width: 320px;
     background-color: var(--sidebar-bg);
@@ -195,7 +198,10 @@ body {
     color: var(--text-muted);
 }
 
-/* Main Content */
+/* =========================================================
+   Main Content
+   ========================================================= */
+
 .main-content {
     flex: 1;
     display: flex;
@@ -255,7 +261,10 @@ body {
     box-shadow: var(--shadow-sm);
 }
 
-/* Content Area */
+/* =========================================================
+   Content Area
+   ========================================================= */
+
 .content-area {
     flex: 1;
     padding: 2rem;
@@ -314,7 +323,10 @@ body {
     color: var(--primary-color);
 }
 
-/* Trip List */
+/* =========================================================
+   Trip List
+   ========================================================= */
+
 .trip-list {
     display: flex;
     flex-direction: column;
@@ -397,7 +409,10 @@ body {
     color: #cbd5e1;
 }
 
-/* Calendar View */
+/* =========================================================
+   Calendar View
+   ========================================================= */
+
 .calendar-view-container {
     background-color: white;
     border-radius: var(--radius-md);
@@ -473,7 +488,10 @@ body {
     background-color: var(--primary-hover);
 }
 
-/* Notification Dropdown */
+/* =========================================================
+   Notification Dropdown
+   ========================================================= */
+
 .notification-container {
     position: relative;
 }
@@ -557,7 +575,10 @@ body {
     font-size: 0.9rem;
 }
 
-/* Profile Dropdown */
+/* =========================================================
+   Profile Dropdown
+   ========================================================= */
+
 .user-profile {
     position: relative;
     cursor: pointer;
@@ -649,7 +670,10 @@ body {
     color: #ef4444;
 }
 
-/* Detail Page */
+/* =========================================================
+   Detail Page
+   ========================================================= */
+
 .detail-page-container {
     display: flex;
     height: 100vh;
@@ -692,7 +716,10 @@ body {
     margin-top: 0.25rem;
 }
 
-/* Places List in Detail Page */
+/* =========================================================
+   Places List in Detail Page
+   ========================================================= */
+
 .detail-sidebar .places-section {
     flex: 1;
     display: flex;
@@ -793,7 +820,6 @@ body {
 
 .lock-btn.active {
     color: #f59e0b;
-    /* Amber for locked */
 }
 
 .remove-place-btn:hover {
@@ -806,7 +832,10 @@ body {
     justify-content: center;
 }
 
-/* Map */
+/* =========================================================
+   Map
+   ========================================================= */
+
 .map-container {
     flex: 1;
     position: relative;
@@ -817,7 +846,10 @@ body {
     height: 100%;
 }
 
-/* Add Trip Page Redesign */
+/* =========================================================
+   Add Trip Page
+   ========================================================= */
+
 .add-page-container {
     min-height: 100vh;
     display: flex;
@@ -910,117 +942,383 @@ body {
 }
 
 
+/* =========================================================
+   모바일 전용
+   PC에는 영향을 주지 않음
+   ========================================================= */
+
+.mobile-logo,
+.mobile-welcome {
+    display: none;
+}
+
+
 @media (max-width: 768px) {
+
+    /* -----------------------------------------------------
+       전체 페이지
+       ----------------------------------------------------- */
+
+    html,
+    body {
+        width: 100%;
+        min-height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+    }
 
     body {
         height: auto;
         min-height: 100vh;
-        overflow: auto;
+        overflow-y: auto;
     }
-
-    /* =========================
-       메인 페이지
-       ========================= */
 
     .app-container {
-        flex-direction: column;
-        height: auto;
+        width: 100%;
         min-height: 100vh;
+        height: auto;
+        display: flex;
+        flex-direction: column;
     }
+
+
+    /* -----------------------------------------------------
+       사이드바
+       ----------------------------------------------------- */
 
     .sidebar {
+        order: 1;
         width: 100%;
         height: auto;
+        min-height: 0;
+        padding: 1rem;
         border-right: none;
         border-bottom: 1px solid var(--border-color);
-        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        background-color: white;
     }
 
-    .logo-area {
-        margin-bottom: 1rem;
+    /* 모바일에서는 PC 사이드바 로고 제거 */
+    .sidebar .logo-area {
+        display: none;
     }
 
     .places-section {
-        overflow: visible;
-    }
-
-    .sidebar-actions {
-        margin-top: 1rem;
-    }
-
-    .trip-stats {
-        margin-top: 1rem;
-    }
-
-    .main-content {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-}
-
-
-    .top-bar {
+        width: 100%;
         height: auto;
-        min-height: 70px;
-        padding: 1rem;
+        min-height: 0;
+        overflow: visible;
+        display: flex;
+        flex-direction: column;
     }
 
-    .user-welcome h2 {
+
+    /* -----------------------------------------------------
+       환영 문구
+       ----------------------------------------------------- */
+
+    .mobile-welcome {
+        display: block;
+        width: 100%;
+        margin-bottom: 1.5rem;
+    }
+
+    .mobile-welcome h2 {
+        margin: 0 0 0.4rem 0;
+        font-size: 1.6rem;
+        line-height: 1.3;
+        font-weight: 700;
+        color: var(--text-main);
+    }
+
+    .mobile-welcome p {
+        margin: 0;
+        font-size: 1rem;
+        line-height: 1.5;
+        color: var(--text-main);
+    }
+
+
+    /* -----------------------------------------------------
+       여행지 검색
+       ----------------------------------------------------- */
+
+    .add-place-form {
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+
+    .section-header h2 {
+        font-size: 1rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .filter-label {
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .input-group input,
+    .input-group select {
+        width: 100%;
+        min-height: 52px;
+        padding: 0.75rem;
         font-size: 1rem;
     }
 
-    .user-welcome p {
-        font-size: 0.75rem;
+
+    /* -----------------------------------------------------
+       기간 검색
+       ----------------------------------------------------- */
+
+    .period-search-group {
+        width: 100%;
+        margin-top: 1rem;
     }
+
+    .date-filter-group {
+        width: 100%;
+        display: flex;
+        gap: 0.75rem;
+    }
+
+    .date-filter-group .input-group {
+        flex: 1;
+        min-width: 0;
+    }
+
+
+    /* -----------------------------------------------------
+       검색 / 새 일정 버튼
+       ----------------------------------------------------- */
+
+    .sidebar-actions {
+        width: 100%;
+        margin-top: 1rem;
+        padding-top: 1rem;
+    }
+
+    .btn-secondary {
+        width: 100%;
+        min-height: 52px;
+        margin-top: 0;
+        font-size: 1rem;
+    }
+
+
+    /* -----------------------------------------------------
+       통계 카드
+       ----------------------------------------------------- */
+
+    .trip-stats {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.75rem;
+        margin-top: 1rem;
+        padding-top: 1rem;
+    }
+
+    .stat-card {
+        min-width: 0;
+        padding: 0.85rem 0.4rem;
+        border-radius: 0.75rem;
+    }
+
+    .stat-number {
+        font-size: 1.5rem;
+        line-height: 1.2;
+    }
+
+    .stat-label {
+        display: block;
+        margin-top: 0.25rem;
+        font-size: 0.75rem;
+        white-space: nowrap;
+    }
+
+
+    /* -----------------------------------------------------
+       메인 영역
+       ----------------------------------------------------- */
+
+    .main-content {
+        order: 2;
+        width: 100%;
+        min-width: 0;
+        height: auto;
+        display: flex;
+        flex-direction: column;
+        overflow: visible;
+    }
+
+
+    /* -----------------------------------------------------
+       모바일 로고
+       ----------------------------------------------------- */
+
+    .top-bar {
+        width: 100%;
+        height: auto;
+        min-height: 76px;
+        padding: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-shrink: 0;
+        background-color: rgba(248, 250, 252, 0.95);
+        border-bottom: 1px solid var(--border-color);
+        position: relative;
+        z-index: 50;
+    }
+
+    /* PC 환영 문구 숨김 */
+    .top-bar .user-welcome {
+        display: none !important;
+    }
+
+    .mobile-logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 0;
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--text-main);
+    }
+
+    .mobile-logo i {
+        color: var(--primary-color);
+        font-size: 1.5rem;
+        flex-shrink: 0;
+    }
+
+    .mobile-logo > span > span {
+        color: var(--primary-color);
+    }
+
+
+    /* -----------------------------------------------------
+       알림 / 프로필
+       ----------------------------------------------------- */
 
     .actions {
+        display: flex;
+        align-items: center;
         gap: 0.25rem;
+        margin-left: auto;
     }
 
+    .btn-icon {
+        padding: 0.5rem;
+        font-size: 1.2rem;
+    }
+
+    .user-profile img {
+        width: 42px;
+        height: 42px;
+    }
+
+
+    /* -----------------------------------------------------
+       일정 콘텐츠
+       ----------------------------------------------------- */
+
     .content-area {
+        width: 100%;
         padding: 1rem;
         overflow: visible;
     }
 
     .section-header {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
         align-items: flex-start;
         gap: 1rem;
-        flex-wrap: wrap;
+        margin-bottom: 1.5rem;
     }
 
     .tab-container {
+        display: flex;
         gap: 0.75rem;
+        flex-shrink: 0;
     }
 
     .tab-btn {
-        font-size: 0.9rem;
+        font-size: 1rem;
+        white-space: nowrap;
     }
 
     .view-options {
+        flex-shrink: 0;
         margin-left: auto;
     }
 
+
+    /* -----------------------------------------------------
+       여행 카드
+       ----------------------------------------------------- */
+
+    .trip-list {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
     .trip-card {
+        width: 100%;
+        min-width: 0;
         padding: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
     }
 
     .trip-info {
+        min-width: 0;
+        display: flex;
         flex-direction: column;
         align-items: flex-start;
         gap: 0.35rem;
+        flex: 1;
     }
 
     .trip-info h3 {
-        font-size: 1rem;
+        font-size: 1.05rem;
+        line-height: 1.3;
     }
 
     .trip-info p {
-        font-size: 0.8rem;
+        font-size: 0.85rem;
+        line-height: 1.4;
     }
 
-    /* 캘린더 */
+    .delete-trip-btn {
+        flex-shrink: 0;
+    }
+
+
+    /* -----------------------------------------------------
+       빈 상태
+       ----------------------------------------------------- */
+
+    .empty-state {
+        width: 100%;
+        min-height: 350px;
+        padding: 2rem 1rem;
+    }
+
+
+    /* -----------------------------------------------------
+       캘린더
+       ----------------------------------------------------- */
 
     .calendar-view-container {
+        width: 100%;
         height: auto;
         min-height: 500px;
         padding: 0.75rem;
@@ -1038,25 +1336,42 @@ body {
         padding: 2px 3px;
     }
 
-    /* 알림 */
+
+    /* -----------------------------------------------------
+       알림
+       ----------------------------------------------------- */
 
     .notification-dropdown {
         position: fixed;
         top: 70px;
-        right: 1rem;
         left: 1rem;
+        right: 1rem;
         width: auto;
+        max-width: none;
     }
 
 
-    /* =========================
+    /* -----------------------------------------------------
+       프로필
+       ----------------------------------------------------- */
+
+    .profile-dropdown {
+        position: absolute;
+        right: 0;
+        width: 200px;
+    }
+
+
+    /* -----------------------------------------------------
        여행 상세 페이지
-       ========================= */
+       ----------------------------------------------------- */
 
     .detail-page-container {
-        flex-direction: column;
-        height: auto;
+        width: 100%;
         min-height: 100vh;
+        height: auto;
+        display: flex;
+        flex-direction: column;
     }
 
     .detail-sidebar {
@@ -1071,12 +1386,14 @@ body {
     }
 
     .detail-sidebar .places-section {
+        width: 100%;
         padding: 1rem;
         max-height: none;
         overflow: visible;
     }
 
     .places-list {
+        width: 100%;
         max-height: 350px;
         overflow-y: auto;
     }
@@ -1093,17 +1410,20 @@ body {
     }
 
 
-    /* =========================
+    /* -----------------------------------------------------
        여행 추가 페이지
-       ========================= */
+       ----------------------------------------------------- */
 
     .add-page-container {
+        width: 100%;
+        min-height: 100vh;
         padding: 1rem;
-        justify-content: flex-start;
         padding-top: 2rem;
+        justify-content: flex-start;
     }
 
     .add-page-header {
+        width: 100%;
         margin-bottom: 1.5rem;
     }
 
@@ -1118,6 +1438,7 @@ body {
     }
 
     .add-form-container {
+        width: 100%;
         padding: 1.5rem;
         border-radius: 0.75rem;
     }
@@ -1129,85 +1450,20 @@ body {
     .date-separator {
         padding-bottom: 0.75rem;
     }
-
-
-    /* =========================
-       프로필
-       ========================= */
-
-    .profile-dropdown {
-        right: 0;
-        width: 200px;
-    }
 }
 
-.mobile-logo {
-    display: none;
-}
 
-/* =========================
-   반응형 로고 / 환영 문구
-   ========================= */
-
-/* PC */
-.mobile-logo,
-.mobile-welcome {
-    display: none;
-}
-
-/* 모바일 */
-@media (max-width: 768px) {
-
-    /* PC용 사이드바 로고 숨김 */
-    .sidebar .logo-area {
-        display: none;
-    }
-
-    /* 모바일 상단 로고 */
-    .mobile-logo {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-size: 1.2rem;
-        font-weight: 700;
-        color: var(--text-main);
-    }
-
-    .mobile-logo i {
-        color: var(--primary-color);
-        font-size: 1.4rem;
-    }
-
-    .mobile-logo > span > span {
-        color: var(--primary-color);
-    }
-
-    /* 모바일 환영 문구 */
-    .mobile-welcome {
-        display: block;
-        margin-bottom: 1.5rem;
-    }
-
-    .mobile-welcome h2 {
-        font-size: 1.6rem;
-        font-weight: 700;
-        margin-bottom: 0.4rem;
-        color: var(--text-main);
-    }
-
-    .mobile-welcome p {
-        font-size: 1rem;
-        color: var(--text-main);
-        margin: 0;
-    }
-
-    /* PC용 환영 문구는 숨김 */
-    .main-content > .top-bar .user-welcome {
-        display: none;
-    }
-}
+/* =========================================================
+   PC 전용
+   ========================================================= */
 
 @media (min-width: 769px) {
+
+    .mobile-logo,
+    .mobile-welcome {
+        display: none !important;
+    }
+
     .user-welcome {
         display: block !important;
     }
