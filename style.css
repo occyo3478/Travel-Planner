@@ -913,10 +913,6 @@ body {
 @media (max-width: 768px) {
 
     body {
-        .main-content {
-            display: contents;
-        }
-
         height: auto;
         min-height: 100vh;
         overflow: auto;
