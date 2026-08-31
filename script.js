@@ -1,40 +1,706 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // ================================
-    // 전역 상태
-    // ================================
-    let trips = [];
-    let currentTab = 'upcoming';
-    let currentView = 'list';
-    let currentCalendarDate = new Date();
-    let trip = null;
+document.addEventListener('DOMContentLoaded', async () => {
 
-    // ================================
+    let trips = [];
+    let currentTrip = null;
+
+    // =========================
     // 페이지 확인
-    // ================================
+    // =========================
+
     const isDetailPage =
-        !!document.getElementById('map') &&
-        !!document.getElementById('places-list');
+        document.getElementById('map') &&
+        document.getElementById('places-list');
 
     const isAddPage =
-        !!document.getElementById('add-btn');
+        document.getElementById('add-btn');
 
     const isIndexPage =
-        !!document.getElementById('trip-list');
+        document.getElementById('trip-list');
 
-    // ================================
-    // 페이지 초기화
-    // ================================
-    if (isDetailPage) {
-        initDetailPage();
-    } else if (isAddPage) {
-        initAddPage();
-    } else if (isIndexPage) {
-        initIndexPage();
+
+    // =========================
+    // Firestore에서 일정 불러오기
+    // =========================
+
+    async function loadTrips() {
+        try {
+            const snapshot = await db.collection('trips').get();
+
+            trips = snapshot.docs.map(doc => {
+                const data = doc.data();
+
+                return {
+                    id: String(doc.id),
+                    destination: data.destination || data.name || '',
+                    startDate: data.startDate || data.date || '',
+                    endDate: data.endDate || data.startDate || data.date || '',
+                    activity: data.activity || '',
+                    places: Array.isArray(data.places)
+                        ? data.places
+                        : []
+                };
+            });
+
+            console.log('Firestore 일정:', trips);
+
+            return trips;
+
+        } catch (error) {
+            console.error('Firestore 불러오기 실패:', error);
+            alert('여행 일정을 불러오지 못했습니다.');
+            return [];
+        }
     }
 
 
-    // =========================================================
-    // INDEX PAGE
+    // =========================
+    // 일정 하나 저장
+    // =========================
+
+    async function saveTrip(trip) {
+        try {
+            await db.collection('trips')
+                .doc(String(trip.id))
+                .set({
+                    id: trip.id,
+                    destination: trip.destination,
+                    startDate: trip.startDate,
+                    endDate: trip.endDate,
+                    activity: trip.activity || '',
+                    places: trip.places || []
+                }, {
+                    merge: true
+                });
+
+            console.log('Firestore 저장 완료');
+
+        } catch (error) {
+            console.error('Firestore 저장 실패:', error);
+            alert('저장에 실패했습니다.');
+        }
+    }
+
+
+    // =========================
+    // INDEX 페이지
+    // =========================
+
+    async function initIndexPage() {
+
+        const tripList = document.getElementById('trip-list');
+        const emptyState = document.getElementById('empty-state');
+
+        await loadTrips();
+
+        renderTripList();
+
+        function renderTripList() {
+
+            if (!tripList) return;
+
+            tripList.querySelectorAll('.trip-card').forEach(card => {
+                card.remove();
+            });
+
+            if (trips.length === 0) {
+
+                if (emptyState) {
+                    emptyState.style.display = 'flex';
+                }
+
+                return;
+            }
+
+            if (emptyState) {
+                emptyState.style.display = 'none';
+            }
+
+            trips.forEach(trip => {
+
+                const card = document.createElement('div');
+
+                card.className = 'trip-card';
+
+                card.innerHTML = `
+                    <div class="trip-info">
+                        <h3>${escapeHTML(trip.destination)}</h3>
+                        <p>${trip.startDate} ~ ${trip.endDate}</p>
+                    </div>
+
+                    <button class="delete-trip-btn">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                `;
+
+                // 카드 클릭 → 상세 페이지
+                card.addEventListener('click', function (event) {
+
+                    if (event.target.closest('.delete-trip-btn')) {
+                        return;
+                    }
+
+                    console.log('상세 페이지 이동:', trip.id);
+
+                    window.location.href =
+                        `trip_detail.html?id=${encodeURIComponent(trip.id)}`;
+                });
+
+
+                // 삭제
+                const deleteBtn =
+                    card.querySelector('.delete-trip-btn');
+
+                deleteBtn.addEventListener('click', async function (event) {
+
+                    event.stopPropagation();
+
+                    if (!confirm('정말 이 여행 일정을 삭제하시겠습니까?')) {
+                        return;
+                    }
+
+                    try {
+
+                        await db.collection('trips')
+                            .doc(String(trip.id))
+                            .delete();
+
+                        trips = trips.filter(
+                            t => String(t.id) !== String(trip.id)
+                        );
+
+                        renderTripList();
+
+                    } catch (error) {
+
+                        console.error('삭제 실패:', error);
+                        alert('삭제에 실패했습니다.');
+
+                    }
+                });
+
+
+                tripList.appendChild(card);
+            });
+        }
+    }
+
+
+    // =========================
+    // ADD 페이지
+    // =========================
+
+    async function initAddPage() {
+
+        const addBtn = document.getElementById('add-btn');
+
+        const destinationInput =
+            document.getElementById('destination');
+
+        const startDateInput =
+            document.getElementById('start-date');
+
+        const endDateInput =
+            document.getElementById('end-date');
+
+        const activityInput =
+            document.getElementById('activity');
+
+
+        addBtn.addEventListener('click', async () => {
+
+            const destination =
+                destinationInput.value.trim();
+
+            const startDate =
+                startDateInput.value;
+
+            const endDate =
+                endDateInput.value;
+
+            const activity =
+                activityInput.value.trim();
+
+
+            if (!destination || !startDate || !endDate) {
+
+                alert('필수 정보를 입력해주세요.');
+                return;
+            }
+
+
+            const newTrip = {
+
+                id: String(Date.now()),
+
+                destination: destination,
+
+                startDate: startDate,
+
+                endDate: endDate,
+
+                activity: activity,
+
+                places: []
+            };
+
+
+            try {
+
+                await saveTrip(newTrip);
+
+                alert('여행 일정이 저장되었습니다.');
+
+                window.location.href = 'index.html';
+
+            } catch (error) {
+
+                console.error(error);
+
+                alert('여행 일정 저장에 실패했습니다.');
+            }
+        });
+    }
+
+
+    // =========================
+    // 상세 페이지
+    // =========================
+
+    async function initDetailPage() {
+
+        console.log('===== 상세 페이지 시작 =====');
+
+
+        // Firestore에서 일정 불러오기
+        await loadTrips();
+
+
+        // URL에서 id 가져오기
+        const params =
+            new URLSearchParams(window.location.search);
+
+        const tripId =
+            params.get('id');
+
+
+        console.log('URL 여행 ID:', tripId);
+
+
+        if (!tripId) {
+
+            alert('여행 ID가 없습니다.');
+
+            window.location.href = 'index.html';
+
+            return;
+        }
+
+
+        // 여행 찾기
+        currentTrip = trips.find(
+            t => String(t.id) === String(tripId)
+        );
+
+
+        console.log('찾은 여행:', currentTrip);
+
+
+        if (!currentTrip) {
+
+            alert('여행 정보를 찾을 수 없습니다.');
+
+            window.location.href = 'index.html';
+
+            return;
+        }
+
+
+        // =========================
+        // 제목
+        // =========================
+
+        const title =
+            document.getElementById('trip-title');
+
+        const dates =
+            document.getElementById('trip-dates');
+
+
+        if (title) {
+            title.textContent =
+                currentTrip.destination;
+        }
+
+        if (dates) {
+            dates.textContent =
+                `${currentTrip.startDate} ~ ${currentTrip.endDate}`;
+        }
+
+
+        // =========================
+        // Leaflet 지도
+        // =========================
+
+        const mapElement =
+            document.getElementById('map');
+
+
+        if (!mapElement) {
+
+            console.error(
+                'HTML에 id="map" 요소가 없습니다.'
+            );
+
+            return;
+        }
+
+
+        // Leaflet이 로드됐는지 확인
+        if (typeof L === 'undefined') {
+
+            console.error(
+                'Leaflet L 객체가 없습니다.'
+            );
+
+            alert(
+                '지도 라이브러리(Leaflet)가 로드되지 않았습니다.'
+            );
+
+            return;
+        }
+
+
+        console.log('Leaflet 로드 확인 완료');
+
+
+        const map =
+            L.map('map').setView(
+                [37.5665, 126.9780],
+                10
+            );
+
+
+        L.tileLayer(
+            'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+            {
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap'
+            }
+        ).addTo(map);
+
+
+        // =========================
+        // 장소 관련 요소
+        // =========================
+
+        const placeInput =
+            document.getElementById('place-input');
+
+        const addPlaceBtn =
+            document.getElementById('add-place-btn');
+
+        const placesList =
+            document.getElementById('places-list');
+
+
+        // 기존 장소 표시
+        renderPlaces();
+
+
+        // =========================
+        // 장소 추가
+        // =========================
+
+        if (addPlaceBtn) {
+
+            addPlaceBtn.addEventListener(
+                'click',
+                async () => {
+
+                    const placeName =
+                        placeInput.value.trim();
+
+
+                    if (!placeName) {
+
+                        alert('장소를 입력해주세요.');
+
+                        return;
+                    }
+
+
+                    try {
+
+                        const response =
+                            await fetch(
+                                `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(placeName)}`
+                            );
+
+
+                        if (!response.ok) {
+
+                            throw new Error(
+                                '장소 검색 실패'
+                            );
+                        }
+
+
+                        const data =
+                            await response.json();
+
+
+                        if (!data || data.length === 0) {
+
+                            alert('장소를 찾을 수 없습니다.');
+
+                            return;
+                        }
+
+
+                        const result = data[0];
+
+
+                        const newPlace = {
+
+                            id: String(Date.now()),
+
+                            name: placeName,
+
+                            lat: Number(result.lat),
+
+                            lng: Number(result.lon),
+
+                            isLocked: false
+                        };
+
+
+                        if (!Array.isArray(currentTrip.places)) {
+
+                            currentTrip.places = [];
+                        }
+
+
+                        currentTrip.places.push(newPlace);
+
+
+                        await saveTrip(currentTrip);
+
+
+                        placeInput.value = '';
+
+
+                        renderPlaces();
+
+
+                    } catch (error) {
+
+                        console.error(
+                            '장소 추가 오류:',
+                            error
+                        );
+
+                        alert(
+                            '장소를 추가하는 중 오류가 발생했습니다.'
+                        );
+                    }
+                }
+            );
+        }
+
+
+        // =========================
+        // 장소 렌더링
+        // =========================
+
+        function renderPlaces() {
+
+            if (!placesList) return;
+
+
+            placesList.innerHTML = '';
+
+
+            // 기존 마커 제거
+            map.eachLayer(layer => {
+
+                if (
+                    layer instanceof L.Marker ||
+                    layer instanceof L.Polyline
+                ) {
+
+                    map.removeLayer(layer);
+                }
+            });
+
+
+            const places =
+                currentTrip.places || [];
+
+
+            if (places.length === 0) {
+
+                placesList.innerHTML = `
+                    <div class="empty-places">
+                        <p>방문할 장소를 추가해보세요!</p>
+                    </div>
+                `;
+
+                return;
+            }
+
+
+            const latlngs = [];
+
+
+            places.forEach((place, index) => {
+
+                // 리스트
+                const item =
+                    document.createElement('div');
+
+                item.className = 'place-item';
+
+
+                item.innerHTML = `
+
+                    <span class="place-number">
+                        ${index + 1}
+                    </span>
+
+                    <span class="place-name">
+                        ${escapeHTML(place.name)}
+                    </span>
+
+                    <button
+                        class="remove-place-btn"
+                        data-id="${place.id}"
+                    >
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                `;
+
+
+                const removeBtn =
+                    item.querySelector(
+                        '.remove-place-btn'
+                    );
+
+
+                removeBtn.addEventListener(
+                    'click',
+                    async () => {
+
+                        currentTrip.places =
+                            currentTrip.places.filter(
+                                p =>
+                                    String(p.id) !==
+                                    String(place.id)
+                            );
+
+
+                        await saveTrip(currentTrip);
+
+                        renderPlaces();
+                    }
+                );
+
+
+                placesList.appendChild(item);
+
+
+                // 지도 마커
+                const marker =
+                    L.marker([
+                        place.lat,
+                        place.lng
+                    ]).addTo(map);
+
+
+                marker.bindPopup(
+                    `${index + 1}. ${escapeHTML(place.name)}`
+                );
+
+
+                latlngs.push([
+                    place.lat,
+                    place.lng
+                ]);
+            });
+
+
+            // 경로
+            if (latlngs.length > 1) {
+
+                L.polyline(
+                    latlngs
+                ).addTo(map);
+
+
+                map.fitBounds(latlngs);
+            }
+
+
+            if (latlngs.length === 1) {
+
+                map.setView(
+                    latlngs[0],
+                    13
+                );
+            }
+        }
+    }
+
+
+    // =========================
+    // HTML 문자 처리
+    // =========================
+
+    function escapeHTML(value) {
+
+        return String(value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+
+    // =========================
+    // 실행
+    // =========================
+
+    try {
+
+        if (isDetailPage) {
+
+            await initDetailPage();
+
+        } else if (isAddPage) {
+
+            await initAddPage();
+
+        } else if (isIndexPage) {
+
+            await initIndexPage();
+
+        } else {
+
+            console.log(
+                '알 수 없는 페이지입니다.'
+            );
+        }
+
+    } catch (error) {
+
+        console.error(
+            '페이지 초기화 오류:',
+            error
+        );
+
+    }
+
+});    // INDEX PAGE
     // =========================================================
     function initIndexPage() {
 
