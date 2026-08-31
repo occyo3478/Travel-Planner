@@ -49,7 +49,27 @@
         </main>
     </div>
 
-    <script type="module" src="script.js"></script>
+    <!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyDqAZiiw7SKc4SLSsWug1G3e_f5-u-pkYw",
+        authDomain: "travel-planner-a9d51.firebaseapp.com",
+        projectId: "travel-planner-a9d51",
+        storageBucket: "travel-planner-a9d51.firebasestorage.app",
+        messagingSenderId: "966221614343",
+        appId: "1:966221614343:web:f48783ed75140a8be589a2",
+        measurementId: "G-6RSREEXYS4"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+</script>
+
+<!-- 내 JS -->
+<script src="script.js"></script>
 </body>
 
 </html>
