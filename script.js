@@ -1,11 +1,35 @@
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
+
+    // =========================================================
+    // Firebase 설정
+    // =========================================================
+
+    // 이미 HTML의 다른 JS에서 firebase/db를 만들고 있다면
+    // 아래 Firebase 초기화 부분은 넣지 않아도 됩니다.
+    //
+    // 반드시 window.db가 존재해야 합니다.
+
+    if (typeof db === 'undefined') {
+        console.error('Firebase db가 없습니다.');
+        alert('Firebase 연결을 확인해주세요.');
+        return;
+    }
+
+
+    // =========================================================
+    // 공통 상태
+    // =========================================================
 
     let trips = [];
+    let currentTab = 'upcoming';
+    let currentView = 'list';
+    let currentCalendarDate = new Date();
     let currentTrip = null;
 
-    // =========================
+
+    // =========================================================
     // 페이지 확인
-    // =========================
+    // =========================================================
 
     const isDetailPage =
         document.getElementById('map') &&
@@ -18,719 +42,207 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('trip-list');
 
 
-    // =========================
-    // Firestore에서 일정 불러오기
-    // =========================
+    console.log('페이지 확인:', {
+        isDetailPage,
+        isAddPage,
+        isIndexPage
+    });
+
+
+    // =========================================================
+    // 페이지 실행
+    // =========================================================
+
+    if (isDetailPage) {
+        initDetailPage();
+    }
+    else if (isAddPage) {
+        initAddPage();
+    }
+    else if (isIndexPage) {
+        initIndexPage();
+    }
+
+
+
+    // =========================================================
+    // Firestore에서 여행 전체 불러오기
+    // =========================================================
 
     async function loadTrips() {
+
         try {
-            const snapshot = await db.collection('trips').get();
+
+            const snapshot = await db
+                .collection('trips')
+                .get();
 
             trips = snapshot.docs.map(doc => {
+
                 const data = doc.data();
 
                 return {
                     id: String(doc.id),
-                    destination: data.destination || data.name || '',
-                    startDate: data.startDate || data.date || '',
-                    endDate: data.endDate || data.startDate || data.date || '',
-                    activity: data.activity || '',
-                    places: Array.isArray(data.places)
-                        ? data.places
-                        : []
+
+                    destination:
+                        data.destination ||
+                        data.name ||
+                        '',
+
+                    startDate:
+                        data.startDate ||
+                        data.date ||
+                        '',
+
+                    endDate:
+                        data.endDate ||
+                        data.startDate ||
+                        data.date ||
+                        '',
+
+                    activity:
+                        data.activity ||
+                        '',
+
+                    places:
+                        Array.isArray(data.places)
+                            ? data.places
+                            : []
                 };
+
             });
 
-            console.log('Firestore 일정:', trips);
+            console.log('Firestore 여행 데이터:', trips);
 
             return trips;
 
-        } catch (error) {
-            console.error('Firestore 불러오기 실패:', error);
-            alert('여행 일정을 불러오지 못했습니다.');
-            return [];
         }
+        catch (error) {
+
+            console.error(
+                'Firestore 불러오기 실패:',
+                error
+            );
+
+            alert(
+                'Firestore에서 여행 정보를 불러오지 못했습니다.'
+            );
+
+            trips = [];
+
+            return [];
+
+        }
+
     }
 
 
-    // =========================
-    // 일정 하나 저장
-    // =========================
+
+    // =========================================================
+    // 여행 하나 저장
+    // =========================================================
 
     async function saveTrip(trip) {
+
+        if (!trip) {
+            console.error('저장할 여행이 없습니다.');
+            return false;
+        }
+
         try {
-            await db.collection('trips')
-                .doc(String(trip.id))
+
+            const id = String(trip.id);
+
+            await db
+                .collection('trips')
+                .doc(id)
                 .set({
+
                     id: trip.id,
-                    destination: trip.destination,
-                    startDate: trip.startDate,
-                    endDate: trip.endDate,
-                    activity: trip.activity || '',
-                    places: trip.places || []
+
+                    destination:
+                        trip.destination || '',
+
+                    startDate:
+                        trip.startDate || '',
+
+                    endDate:
+                        trip.endDate || '',
+
+                    activity:
+                        trip.activity || '',
+
+                    places:
+                        Array.isArray(trip.places)
+                            ? trip.places
+                            : []
+
                 }, {
                     merge: true
                 });
 
-            console.log('Firestore 저장 완료');
-
-        } catch (error) {
-            console.error('Firestore 저장 실패:', error);
-            alert('저장에 실패했습니다.');
-        }
-    }
-
-
-    // =========================
-    // INDEX 페이지
-    // =========================
-
-    async function initIndexPage() {
-
-        const tripList = document.getElementById('trip-list');
-        const emptyState = document.getElementById('empty-state');
-
-        await loadTrips();
-
-        renderTripList();
-
-        function renderTripList() {
-
-            if (!tripList) return;
-
-            tripList.querySelectorAll('.trip-card').forEach(card => {
-                card.remove();
-            });
-
-            if (trips.length === 0) {
-
-                if (emptyState) {
-                    emptyState.style.display = 'flex';
-                }
-
-                return;
-            }
-
-            if (emptyState) {
-                emptyState.style.display = 'none';
-            }
-
-            trips.forEach(trip => {
-
-                const card = document.createElement('div');
-
-                card.className = 'trip-card';
-
-                card.innerHTML = `
-                    <div class="trip-info">
-                        <h3>${escapeHTML(trip.destination)}</h3>
-                        <p>${trip.startDate} ~ ${trip.endDate}</p>
-                    </div>
-
-                    <button class="delete-trip-btn">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
-                `;
-
-                // 카드 클릭 → 상세 페이지
-                card.addEventListener('click', function (event) {
-
-                    if (event.target.closest('.delete-trip-btn')) {
-                        return;
-                    }
-
-                    console.log('상세 페이지 이동:', trip.id);
-
-                    window.location.href =
-                        `trip_detail.html?id=${encodeURIComponent(trip.id)}`;
-                });
-
-
-                // 삭제
-                const deleteBtn =
-                    card.querySelector('.delete-trip-btn');
-
-                deleteBtn.addEventListener('click', async function (event) {
-
-                    event.stopPropagation();
-
-                    if (!confirm('정말 이 여행 일정을 삭제하시겠습니까?')) {
-                        return;
-                    }
-
-                    try {
-
-                        await db.collection('trips')
-                            .doc(String(trip.id))
-                            .delete();
-
-                        trips = trips.filter(
-                            t => String(t.id) !== String(trip.id)
-                        );
-
-                        renderTripList();
-
-                    } catch (error) {
-
-                        console.error('삭제 실패:', error);
-                        alert('삭제에 실패했습니다.');
-
-                    }
-                });
-
-
-                tripList.appendChild(card);
-            });
-        }
-    }
-
-
-    // =========================
-    // ADD 페이지
-    // =========================
-
-    async function initAddPage() {
-
-        const addBtn = document.getElementById('add-btn');
-
-        const destinationInput =
-            document.getElementById('destination');
-
-        const startDateInput =
-            document.getElementById('start-date');
-
-        const endDateInput =
-            document.getElementById('end-date');
-
-        const activityInput =
-            document.getElementById('activity');
-
-
-        addBtn.addEventListener('click', async () => {
-
-            const destination =
-                destinationInput.value.trim();
-
-            const startDate =
-                startDateInput.value;
-
-            const endDate =
-                endDateInput.value;
-
-            const activity =
-                activityInput.value.trim();
-
-
-            if (!destination || !startDate || !endDate) {
-
-                alert('필수 정보를 입력해주세요.');
-                return;
-            }
-
-
-            const newTrip = {
-
-                id: String(Date.now()),
-
-                destination: destination,
-
-                startDate: startDate,
-
-                endDate: endDate,
-
-                activity: activity,
-
-                places: []
-            };
-
-
-            try {
-
-                await saveTrip(newTrip);
-
-                alert('여행 일정이 저장되었습니다.');
-
-                window.location.href = 'index.html';
-
-            } catch (error) {
-
-                console.error(error);
-
-                alert('여행 일정 저장에 실패했습니다.');
-            }
-        });
-    }
-
-
-    // =========================
-    // 상세 페이지
-    // =========================
-
-    async function initDetailPage() {
-
-        console.log('===== 상세 페이지 시작 =====');
-
-
-        // Firestore에서 일정 불러오기
-        await loadTrips();
-
-
-        // URL에서 id 가져오기
-        const params =
-            new URLSearchParams(window.location.search);
-
-        const tripId =
-            params.get('id');
-
-
-        console.log('URL 여행 ID:', tripId);
-
-
-        if (!tripId) {
-
-            alert('여행 ID가 없습니다.');
-
-            window.location.href = 'index.html';
-
-            return;
-        }
-
-
-        // 여행 찾기
-        currentTrip = trips.find(
-            t => String(t.id) === String(tripId)
-        );
-
-
-        console.log('찾은 여행:', currentTrip);
-
-
-        if (!currentTrip) {
-
-            alert('여행 정보를 찾을 수 없습니다.');
-
-            window.location.href = 'index.html';
-
-            return;
-        }
-
-
-        // =========================
-        // 제목
-        // =========================
-
-        const title =
-            document.getElementById('trip-title');
-
-        const dates =
-            document.getElementById('trip-dates');
-
-
-        if (title) {
-            title.textContent =
-                currentTrip.destination;
-        }
-
-        if (dates) {
-            dates.textContent =
-                `${currentTrip.startDate} ~ ${currentTrip.endDate}`;
-        }
-
-
-        // =========================
-        // Leaflet 지도
-        // =========================
-
-        const mapElement =
-            document.getElementById('map');
-
-
-        if (!mapElement) {
-
-            console.error(
-                'HTML에 id="map" 요소가 없습니다.'
+            console.log(
+                '여행 저장 완료:',
+                id
             );
 
-            return;
+            return true;
+
         }
-
-
-        // Leaflet이 로드됐는지 확인
-        if (typeof L === 'undefined') {
+        catch (error) {
 
             console.error(
-                'Leaflet L 객체가 없습니다.'
+                '여행 저장 실패:',
+                error
             );
 
             alert(
-                '지도 라이브러리(Leaflet)가 로드되지 않았습니다.'
+                '여행 저장에 실패했습니다.'
             );
 
-            return;
+            return false;
+
         }
 
-
-        console.log('Leaflet 로드 확인 완료');
-
-
-        const map =
-            L.map('map').setView(
-                [37.5665, 126.9780],
-                10
-            );
-
-
-        L.tileLayer(
-            'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-            {
-                maxZoom: 19,
-                attribution: '&copy; OpenStreetMap'
-            }
-        ).addTo(map);
-
-
-        // =========================
-        // 장소 관련 요소
-        // =========================
-
-        const placeInput =
-            document.getElementById('place-input');
-
-        const addPlaceBtn =
-            document.getElementById('add-place-btn');
-
-        const placesList =
-            document.getElementById('places-list');
-
-
-        // 기존 장소 표시
-        renderPlaces();
-
-
-        // =========================
-        // 장소 추가
-        // =========================
-
-        if (addPlaceBtn) {
-
-            addPlaceBtn.addEventListener(
-                'click',
-                async () => {
-
-                    const placeName =
-                        placeInput.value.trim();
-
-
-                    if (!placeName) {
-
-                        alert('장소를 입력해주세요.');
-
-                        return;
-                    }
-
-
-                    try {
-
-                        const response =
-                            await fetch(
-                                `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(placeName)}`
-                            );
-
-
-                        if (!response.ok) {
-
-                            throw new Error(
-                                '장소 검색 실패'
-                            );
-                        }
-
-
-                        const data =
-                            await response.json();
-
-
-                        if (!data || data.length === 0) {
-
-                            alert('장소를 찾을 수 없습니다.');
-
-                            return;
-                        }
-
-
-                        const result = data[0];
-
-
-                        const newPlace = {
-
-                            id: String(Date.now()),
-
-                            name: placeName,
-
-                            lat: Number(result.lat),
-
-                            lng: Number(result.lon),
-
-                            isLocked: false
-                        };
-
-
-                        if (!Array.isArray(currentTrip.places)) {
-
-                            currentTrip.places = [];
-                        }
-
-
-                        currentTrip.places.push(newPlace);
-
-
-                        await saveTrip(currentTrip);
-
-
-                        placeInput.value = '';
-
-
-                        renderPlaces();
-
-
-                    } catch (error) {
-
-                        console.error(
-                            '장소 추가 오류:',
-                            error
-                        );
-
-                        alert(
-                            '장소를 추가하는 중 오류가 발생했습니다.'
-                        );
-                    }
-                }
-            );
-        }
-
-
-        // =========================
-        // 장소 렌더링
-        // =========================
-
-        function renderPlaces() {
-
-            if (!placesList) return;
-
-
-            placesList.innerHTML = '';
-
-
-            // 기존 마커 제거
-            map.eachLayer(layer => {
-
-                if (
-                    layer instanceof L.Marker ||
-                    layer instanceof L.Polyline
-                ) {
-
-                    map.removeLayer(layer);
-                }
-            });
-
-
-            const places =
-                currentTrip.places || [];
-
-
-            if (places.length === 0) {
-
-                placesList.innerHTML = `
-                    <div class="empty-places">
-                        <p>방문할 장소를 추가해보세요!</p>
-                    </div>
-                `;
-
-                return;
-            }
-
-
-            const latlngs = [];
-
-
-            places.forEach((place, index) => {
-
-                // 리스트
-                const item =
-                    document.createElement('div');
-
-                item.className = 'place-item';
-
-
-                item.innerHTML = `
-
-                    <span class="place-number">
-                        ${index + 1}
-                    </span>
-
-                    <span class="place-name">
-                        ${escapeHTML(place.name)}
-                    </span>
-
-                    <button
-                        class="remove-place-btn"
-                        data-id="${place.id}"
-                    >
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
-                `;
-
-
-                const removeBtn =
-                    item.querySelector(
-                        '.remove-place-btn'
-                    );
-
-
-                removeBtn.addEventListener(
-                    'click',
-                    async () => {
-
-                        currentTrip.places =
-                            currentTrip.places.filter(
-                                p =>
-                                    String(p.id) !==
-                                    String(place.id)
-                            );
-
-
-                        await saveTrip(currentTrip);
-
-                        renderPlaces();
-                    }
-                );
-
-
-                placesList.appendChild(item);
-
-
-                // 지도 마커
-                const marker =
-                    L.marker([
-                        place.lat,
-                        place.lng
-                    ]).addTo(map);
-
-
-                marker.bindPopup(
-                    `${index + 1}. ${escapeHTML(place.name)}`
-                );
-
-
-                latlngs.push([
-                    place.lat,
-                    place.lng
-                ]);
-            });
-
-
-            // 경로
-            if (latlngs.length > 1) {
-
-                L.polyline(
-                    latlngs
-                ).addTo(map);
-
-
-                map.fitBounds(latlngs);
-            }
-
-
-            if (latlngs.length === 1) {
-
-                map.setView(
-                    latlngs[0],
-                    13
-                );
-            }
-        }
     }
 
 
-    // =========================
-    // HTML 문자 처리
-    // =========================
 
-    function escapeHTML(value) {
-
-        return String(value)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#039;');
-    }
-
-
-    // =========================
-    // 실행
-    // =========================
-
-    try {
-
-        if (isDetailPage) {
-
-            await initDetailPage();
-
-        } else if (isAddPage) {
-
-            await initAddPage();
-
-        } else if (isIndexPage) {
-
-            await initIndexPage();
-
-        } else {
-
-            console.log(
-                '알 수 없는 페이지입니다.'
-            );
-        }
-
-    } catch (error) {
-
-        console.error(
-            '페이지 초기화 오류:',
-            error
-        );
-
-    }
-
-});    // INDEX PAGE
     // =========================================================
+    // INDEX PAGE
+    // =========================================================
+
     function initIndexPage() {
 
-        const tripList = document.getElementById('trip-list');
-        const calendarView = document.getElementById('calendar-view');
-        const emptyState = document.getElementById('empty-state');
+        const tripList =
+            document.getElementById('trip-list');
 
-        const totalTripsEl = document.getElementById('total-trips');
-        const upcomingTripsEl = document.getElementById('upcoming-trips');
-        const pastTripsEl = document.getElementById('past-trips');
+        const calendarView =
+            document.getElementById('calendar-view');
 
-        const tabBtns = document.querySelectorAll('.tab-btn');
-        const viewBtns = document.querySelectorAll('.view-btn');
+        const emptyState =
+            document.getElementById('empty-state');
 
-        const notificationBtn =
-            document.getElementById('notification-btn');
+        const totalTripsEl =
+            document.getElementById('total-trips');
 
-        const notificationDropdown =
-            document.getElementById('notification-dropdown');
+        const upcomingTripsEl =
+            document.getElementById('upcoming-trips');
 
-        const notificationList =
-            document.getElementById('notification-list');
+        const pastTripsEl =
+            document.getElementById('past-trips');
 
-        const profileBtn =
-            document.getElementById('profile-btn');
+        const tabBtns =
+            document.querySelectorAll('.tab-btn');
 
-        const profileDropdown =
-            document.getElementById('profile-dropdown');
+        const viewBtns =
+            document.querySelectorAll('.view-btn');
 
+
+        // -----------------------------------------
         // 검색
+        // -----------------------------------------
+
         const searchNameInput =
             document.getElementById('search-name');
 
@@ -744,243 +256,153 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('search-btn');
 
 
-        // ================================
-        // 연도 선택
-        // ================================
+        // -----------------------------------------
+        // 연도
+        // -----------------------------------------
+
         if (searchYearSelect) {
-            const currentYear = new Date().getFullYear();
+
+            const currentYear =
+                new Date().getFullYear();
 
             for (
                 let year = currentYear - 5;
                 year <= currentYear + 5;
                 year++
             ) {
-                const option = document.createElement('option');
 
-                option.value = String(year);
+                const option =
+                    document.createElement('option');
+
+                option.value = year;
                 option.textContent = `${year}년`;
 
                 searchYearSelect.appendChild(option);
+
             }
 
-            searchYearSelect.value = '';
         }
 
 
-        // ================================
-        // 데이터 불러오기
-        // ================================
-        loadTrips()
-            .then(() => {
-                renderTrips();
-                updateStats();
+        // -----------------------------------------
+        // 초기 로딩
+        // -----------------------------------------
 
-                if (currentView === 'calendar') {
-                    renderCalendar();
-                }
-            });
+        loadTrips().then(() => {
 
-
-        // ================================
-        // 탭 버튼
-        // ================================
-        tabBtns.forEach(btn => {
-
-            btn.addEventListener('click', () => {
-
-                tabBtns.forEach(b =>
-                    b.classList.remove('active')
-                );
-
-                btn.classList.add('active');
-
-                currentTab = btn.dataset.tab || 'upcoming';
-
-                renderTrips();
-            });
+            renderTrips();
+            updateStats();
 
         });
 
 
-        // ================================
-        // 리스트 / 캘린더 버튼
-        // ================================
-        viewBtns.forEach(btn => {
+        // -----------------------------------------
+        // 탭
+        // -----------------------------------------
 
-            btn.addEventListener('click', () => {
+        tabBtns.forEach(btn => {
 
-                const title = btn.getAttribute('title') || '';
+            btn.addEventListener(
+                'click',
+                () => {
 
-                if (title.includes('리스트')) {
+                    tabBtns.forEach(b =>
+                        b.classList.remove('active')
+                    );
 
-                    currentView = 'list';
+                    btn.classList.add('active');
 
-                    if (tripList) {
-                        tripList.style.display = 'flex';
-                    }
-
-                    if (calendarView) {
-                        calendarView.style.display = 'none';
-                    }
-
-                    if (viewBtns[0]) {
-                        viewBtns[0].classList.add('active');
-                    }
-
-                    if (viewBtns[1]) {
-                        viewBtns[1].classList.remove('active');
-                    }
+                    currentTab =
+                        btn.dataset.tab;
 
                     renderTrips();
 
-                } else {
-
-                    currentView = 'calendar';
-
-                    if (tripList) {
-                        tripList.style.display = 'none';
-                    }
-
-                    if (calendarView) {
-                        calendarView.style.display = 'flex';
-                    }
-
-                    if (viewBtns[0]) {
-                        viewBtns[0].classList.remove('active');
-                    }
-
-                    if (viewBtns[1]) {
-                        viewBtns[1].classList.add('active');
-                    }
-
-                    renderCalendar();
                 }
-
-            });
+            );
 
         });
 
 
-        // ================================
-        // 이전 / 다음 달
-        // ================================
-        const prevMonthBtn =
-            document.getElementById('prev-month');
+        // -----------------------------------------
+        // 보기 방식
+        // -----------------------------------------
 
-        const nextMonthBtn =
-            document.getElementById('next-month');
+        viewBtns.forEach(btn => {
 
+            btn.addEventListener(
+                'click',
+                () => {
 
-        if (prevMonthBtn) {
+                    const title =
+                        btn.getAttribute('title') || '';
 
-            prevMonthBtn.addEventListener('click', () => {
+                    if (
+                        title.includes('리스트')
+                    ) {
 
-                currentCalendarDate.setMonth(
-                    currentCalendarDate.getMonth() - 1
-                );
+                        currentView = 'list';
 
-                renderCalendar();
-            });
+                        if (tripList)
+                            tripList.style.display = 'flex';
 
-        }
+                        if (calendarView)
+                            calendarView.style.display = 'none';
 
+                        if (viewBtns[0])
+                            viewBtns[0].classList.add('active');
 
-        if (nextMonthBtn) {
+                        if (viewBtns[1])
+                            viewBtns[1].classList.remove('active');
 
-            nextMonthBtn.addEventListener('click', () => {
+                        renderTrips();
 
-                currentCalendarDate.setMonth(
-                    currentCalendarDate.getMonth() + 1
-                );
+                    }
+                    else {
 
-                renderCalendar();
-            });
+                        currentView = 'calendar';
 
-        }
+                        if (tripList)
+                            tripList.style.display = 'none';
 
+                        if (calendarView)
+                            calendarView.style.display = 'flex';
 
-        // ================================
-        // 알림
-        // ================================
-        if (notificationBtn && notificationDropdown) {
+                        if (viewBtns[0])
+                            viewBtns[0].classList.remove('active');
 
-            notificationBtn.addEventListener('click', event => {
+                        if (viewBtns[1])
+                            viewBtns[1].classList.add('active');
 
-                event.stopPropagation();
+                        renderCalendar();
 
-                notificationDropdown.classList.toggle('show');
+                    }
 
-                if (
-                    notificationDropdown.classList.contains('show')
-                ) {
-                    renderNotifications();
                 }
-
-            });
-
-        }
-
-
-        // ================================
-        // 프로필
-        // ================================
-        if (profileBtn && profileDropdown) {
-
-            profileBtn.addEventListener('click', event => {
-
-                event.stopPropagation();
-
-                profileDropdown.classList.toggle('show');
-            });
-
-        }
-
-
-        // ================================
-        // 바깥 클릭
-        // ================================
-        document.addEventListener('click', event => {
-
-            if (
-                notificationDropdown &&
-                notificationBtn &&
-                !notificationDropdown.contains(event.target) &&
-                !notificationBtn.contains(event.target)
-            ) {
-                notificationDropdown.classList.remove('show');
-            }
-
-
-            if (
-                profileDropdown &&
-                profileBtn &&
-                !profileDropdown.contains(event.target) &&
-                !profileBtn.contains(event.target)
-            ) {
-                profileDropdown.classList.remove('show');
-            }
+            );
 
         });
 
 
-        // ================================
+        // -----------------------------------------
         // 검색
-        // ================================
+        // -----------------------------------------
+
         if (searchBtn) {
+
             searchBtn.addEventListener(
                 'click',
                 performSearch
             );
-        }
 
+        }
 
         if (searchNameInput) {
 
             searchNameInput.addEventListener(
                 'keypress',
-                event => {
+                e => {
 
-                    if (event.key === 'Enter') {
+                    if (e.key === 'Enter') {
                         performSearch();
                     }
 
@@ -992,205 +414,210 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         function performSearch() {
 
-            const searchTerm =
+            const term =
                 searchNameInput
-                    ? searchNameInput.value.trim().toLowerCase()
+                    ? searchNameInput.value
+                        .trim()
+                        .toLowerCase()
                     : '';
 
-            const searchYear =
+            const year =
                 searchYearSelect
                     ? searchYearSelect.value
                     : '';
 
-            const searchMonth =
+            const month =
                 searchMonthSelect
                     ? searchMonthSelect.value
                     : '';
 
 
-            const filteredTrips = trips.filter(t => {
-
-                const destination =
-                    String(t.destination || '')
-                        .toLowerCase();
-
-                const startDate =
-                    t.startDate || t.date || '';
-
-                const date =
-                    new Date(startDate);
-
-
-                // 이름
-                if (
-                    searchTerm &&
-                    !destination.includes(searchTerm)
-                ) {
-                    return false;
-                }
-
-
-                // 연도
-                if (
-                    searchYear &&
-                    String(date.getFullYear()) !==
-                    String(searchYear)
-                ) {
-                    return false;
-                }
-
-
-                // 월
-                if (
-                    searchMonth &&
-                    String(date.getMonth() + 1) !==
-                    String(searchMonth)
-                ) {
-                    return false;
-                }
-
-
-                return true;
-            });
-
-
-            renderTrips(filteredTrips);
-        }
-
-
-        // ================================
-        // 여행 목록 출력
-        // ================================
-        function renderTrips(tripsToRender = trips) {
-
-            if (!tripList) {
-                return;
-            }
-
-
-            // 기존 카드 삭제
-            tripList
-                .querySelectorAll('.trip-card')
-                .forEach(card => card.remove());
-
-
-            const today = new Date();
-
-            today.setHours(0, 0, 0, 0);
-
-
-            let filteredTrips =
-                tripsToRender.filter(t => {
+            const filtered =
+                trips.filter(t => {
 
                     const date =
                         new Date(
-                            t.startDate || t.date
+                            t.startDate
                         );
 
-                    date.setHours(0, 0, 0, 0);
+                    const nameMatch =
+                        (t.destination || '')
+                            .toLowerCase()
+                            .includes(term);
 
+                    const yearMatch =
+                        !year ||
+                        String(
+                            date.getFullYear()
+                        ) === String(year);
 
-                    if (currentTab === 'upcoming') {
-                        return date >= today;
-                    }
+                    const monthMatch =
+                        !month ||
+                        String(
+                            date.getMonth() + 1
+                        ) === String(month);
 
-                    return date < today;
+                    return (
+                        nameMatch &&
+                        yearMatch &&
+                        monthMatch
+                    );
+
                 });
 
 
-            // 날짜순 정렬
-            filteredTrips.sort((a, b) => {
+            renderTrips(filtered);
 
-                return new Date(
-                    a.startDate || a.date
-                ) - new Date(
-                    b.startDate || b.date
+        }
+
+
+
+        // =====================================================
+        // 여행 카드
+        // =====================================================
+
+        function renderTrips(
+            tripsToRender = trips
+        ) {
+
+            if (!tripList) return;
+
+
+            tripList
+                .querySelectorAll('.trip-card')
+                .forEach(card =>
+                    card.remove()
                 );
 
-            });
+
+            const today =
+                new Date();
+
+            today.setHours(
+                0, 0, 0, 0
+            );
 
 
-            // 지난 여행은 최신순
-            if (currentTab === 'past') {
-                filteredTrips.reverse();
+            let filtered =
+                tripsToRender.filter(t => {
+
+                    const start =
+                        new Date(
+                            t.startDate
+                        );
+
+                    start.setHours(
+                        0, 0, 0, 0
+                    );
+
+                    if (
+                        currentTab === 'upcoming'
+                    ) {
+
+                        return start >= today;
+
+                    }
+
+                    return start < today;
+
+                });
+
+
+            filtered.sort(
+                (a, b) =>
+                    new Date(a.startDate) -
+                    new Date(b.startDate)
+            );
+
+
+            if (
+                currentTab === 'past'
+            ) {
+
+                filtered.reverse();
+
             }
 
 
-            // 없음
-            if (filteredTrips.length === 0) {
+            if (
+                filtered.length === 0
+            ) {
 
-                if (emptyState) {
+                if (emptyState)
                     emptyState.style.display = 'flex';
-                }
 
                 return;
+
             }
 
 
-            if (emptyState) {
+            if (emptyState)
                 emptyState.style.display = 'none';
-            }
 
 
-            // 카드 생성
-            filteredTrips.forEach(t => {
+            filtered.forEach(t => {
 
                 const card =
                     document.createElement('div');
 
-                card.className = 'trip-card';
+                card.className =
+                    'trip-card';
 
 
                 card.innerHTML = `
+
                     <div class="trip-info">
-                        <h3>${escapeHtml(t.destination)}</h3>
-                        <p>${escapeHtml(t.startDate)} ~ ${escapeHtml(t.endDate)}</p>
+
+                        <h3>
+                            ${escapeHtml(t.destination)}
+                        </h3>
+
+                        <p>
+                            ${escapeHtml(t.startDate)}
+                            ~
+                            ${escapeHtml(t.endDate)}
+                        </p>
+
                     </div>
 
                     <button
                         class="delete-trip-btn"
-                        type="button"
                     >
                         <i class="fa-solid fa-trash"></i>
                     </button>
+
                 `;
 
 
                 // 삭제 버튼
                 const deleteBtn =
-                    card.querySelector('.delete-trip-btn');
-
-
-                if (deleteBtn) {
-
-                    deleteBtn.addEventListener(
-                        'click',
-                        event => {
-
-                            event.stopPropagation();
-
-                            deleteTrip(t.id);
-                        }
+                    card.querySelector(
+                        '.delete-trip-btn'
                     );
 
-                }
+
+                deleteBtn.addEventListener(
+                    'click',
+                    async e => {
+
+                        e.stopPropagation();
+
+                        await deleteTrip(
+                            t.id
+                        );
+
+                    }
+                );
 
 
                 // 카드 클릭
                 card.addEventListener(
                     'click',
-                    event => {
+                    () => {
 
-                        if (
-                            event.target.closest(
-                                '.delete-trip-btn'
-                            )
-                        ) {
-                            return;
-                        }
+                        window.location.href =
+                            `trip_detail.html?id=${encodeURIComponent(String(t.id))}`;
 
-
-                        goToDetail(t.id);
                     }
                 );
 
@@ -1202,10 +629,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
 
-        // ================================
+
+        // =====================================================
         // 삭제
-        // ================================
-        window.deleteTrip = async function(id) {
+        // =====================================================
+
+        async function deleteTrip(id) {
 
             if (
                 !confirm(
@@ -1224,224 +653,82 @@ document.addEventListener('DOMContentLoaded', async () => {
                     .delete();
 
 
-                trips = trips.filter(
-                    t => String(t.id) !== String(id)
-                );
+                trips =
+                    trips.filter(
+                        t =>
+                            String(t.id) !==
+                            String(id)
+                    );
 
 
                 renderTrips();
                 updateStats();
 
 
-                alert('여행 일정이 삭제되었습니다.');
-
-
-            } catch (error) {
+            }
+            catch (error) {
 
                 console.error(
-                    '여행 삭제 실패:',
+                    '삭제 실패:',
                     error
                 );
 
                 alert(
-                    '여행 일정 삭제에 실패했습니다.'
+                    '여행 삭제에 실패했습니다.'
                 );
 
             }
 
-        };
+        }
 
 
-        // ================================
+
+        // =====================================================
         // 통계
-        // ================================
+        // =====================================================
+
         function updateStats() {
 
-            const today = new Date();
+            const today =
+                new Date();
 
-            today.setHours(0, 0, 0, 0);
+            today.setHours(
+                0, 0, 0, 0
+            );
 
 
             const upcoming =
-                trips.filter(t => {
-
-                    const date =
-                        new Date(
-                            t.startDate || t.date
-                        );
-
-                    date.setHours(0, 0, 0, 0);
-
-                    return date >= today;
-                }).length;
+                trips.filter(t =>
+                    new Date(t.startDate) >= today
+                ).length;
 
 
             const past =
-                trips.filter(t => {
-
-                    const date =
-                        new Date(
-                            t.startDate || t.date
-                        );
-
-                    date.setHours(0, 0, 0, 0);
-
-                    return date < today;
-                }).length;
+                trips.filter(t =>
+                    new Date(t.startDate) < today
+                ).length;
 
 
-            if (totalTripsEl) {
+            if (totalTripsEl)
                 totalTripsEl.textContent =
                     trips.length;
-            }
 
-            if (upcomingTripsEl) {
+            if (upcomingTripsEl)
                 upcomingTripsEl.textContent =
                     upcoming;
-            }
 
-            if (pastTripsEl) {
+            if (pastTripsEl)
                 pastTripsEl.textContent =
                     past;
-            }
 
         }
 
 
-        // ================================
-        // 알림 출력
-        // ================================
-        function renderNotifications() {
 
-            if (!notificationList) {
-                return;
-            }
-
-
-            notificationList.innerHTML = '';
-
-
-            const today = new Date();
-
-            today.setHours(0, 0, 0, 0);
-
-
-            const upcomingTrips =
-                trips
-                    .filter(t => {
-
-                        const date =
-                            new Date(
-                                t.startDate || t.date
-                            );
-
-                        date.setHours(0, 0, 0, 0);
-
-                        return date >= today;
-                    })
-                    .sort((a, b) => {
-
-                        return new Date(
-                            a.startDate || a.date
-                        ) - new Date(
-                            b.startDate || b.date
-                        );
-
-                    });
-
-
-            if (upcomingTrips.length === 0) {
-
-                notificationList.innerHTML =
-                    '<li class="empty-noti">새로운 알림이 없습니다.</li>';
-
-                return;
-            }
-
-
-            upcomingTrips.forEach(t => {
-
-                const start =
-                    new Date(
-                        t.startDate || t.date
-                    );
-
-                start.setHours(0, 0, 0, 0);
-
-
-                const diffTime =
-                    start.getTime() -
-                    today.getTime();
-
-
-                const diffDays =
-                    Math.ceil(
-                        diffTime /
-                        (1000 * 60 * 60 * 24)
-                    );
-
-
-                const dDayText =
-                    diffDays === 0
-                        ? 'D-Day'
-                        : `D-${diffDays}`;
-
-
-                const badgeClass =
-                    diffDays === 0
-                        ? 'd-day-today'
-                        : 'd-day-upcoming';
-
-
-                const li =
-                    document.createElement('li');
-
-                li.className =
-                    'notification-item';
-
-
-                li.innerHTML = `
-                    <div class="noti-content">
-
-                        <span class="d-day-badge ${badgeClass}">
-                            ${dDayText}
-                        </span>
-
-                        <span class="noti-text">
-                            <strong>${escapeHtml(t.destination)}</strong>
-                            여행이 다가옵니다.
-                        </span>
-
-                    </div>
-                `;
-
-
-                li.addEventListener(
-                    'click',
-                    () => {
-
-                        goToDetail(t.id);
-
-                        if (notificationDropdown) {
-                            notificationDropdown
-                                .classList
-                                .remove('show');
-                        }
-
-                    }
-                );
-
-
-                notificationList.appendChild(li);
-
-            });
-
-        }
-
-
-        // ================================
+        // =====================================================
         // 캘린더
-        // ================================
+        // =====================================================
+
         function renderCalendar() {
 
             const grid =
@@ -1455,9 +742,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 );
 
 
-            if (!grid || !monthDisplay) {
-                return;
-            }
+            if (!grid) return;
 
 
             grid.innerHTML = '';
@@ -1470,16 +755,28 @@ document.addEventListener('DOMContentLoaded', async () => {
                 currentCalendarDate.getMonth();
 
 
-            monthDisplay.textContent =
-                `${year}년 ${month + 1}월`;
+            if (monthDisplay) {
+
+                monthDisplay.textContent =
+                    `${year}년 ${month + 1}월`;
+
+            }
 
 
             const firstDay =
-                new Date(year, month, 1);
+                new Date(
+                    year,
+                    month,
+                    1
+                );
 
 
             const lastDay =
-                new Date(year, month + 1, 0);
+                new Date(
+                    year,
+                    month + 1,
+                    0
+                );
 
 
             const daysInMonth =
@@ -1490,20 +787,23 @@ document.addEventListener('DOMContentLoaded', async () => {
                 firstDay.getDay();
 
 
-            // 앞쪽 빈칸
-            for (let i = 0; i < startDay; i++) {
+            for (
+                let i = 0;
+                i < startDay;
+                i++
+            ) {
 
-                const div =
+                const empty =
                     document.createElement('div');
 
-                div.className =
+                empty.className =
                     'calendar-day empty';
 
-                grid.appendChild(div);
+                grid.appendChild(empty);
+
             }
 
 
-            // 날짜
             for (
                 let day = 1;
                 day <= daysInMonth;
@@ -1520,7 +820,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const number =
                     document.createElement('span');
 
-                number.textContent = day;
+                number.textContent =
+                    day;
+
 
                 div.appendChild(number);
 
@@ -1530,62 +832,26 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
                 const dayTrips =
-                    trips.filter(t => {
-
-                        const start =
-                            t.startDate || t.date || '';
-
-                        const end =
-                            t.endDate ||
-                            t.startDate ||
-                            t.date ||
-                            '';
-
-
-                        return (
-                            dateStr >= start &&
-                            dateStr <= end
-                        );
-                    });
-
-
-                if (dayTrips.length > 0) {
-
-                    div.classList.add(
-                        'has-trip'
+                    trips.filter(t =>
+                        dateStr >= t.startDate &&
+                        dateStr <= t.endDate
                     );
 
 
-                    dayTrips.forEach(t => {
+                dayTrips.forEach(t => {
 
-                        const label =
-                            document.createElement('div');
+                    const label =
+                        document.createElement('div');
 
-                        label.className =
-                            'trip-label';
+                    label.className =
+                        'trip-label';
 
-                        label.textContent =
-                            t.destination;
+                    label.textContent =
+                        t.destination;
 
-                        label.title =
-                            t.destination;
+                    div.appendChild(label);
 
-
-                        label.addEventListener(
-                            'click',
-                            event => {
-
-                                event.stopPropagation();
-
-                                goToDetail(t.id);
-                            }
-                        );
-
-
-                        div.appendChild(label);
-                    });
-
-                }
+                });
 
 
                 grid.appendChild(div);
@@ -1594,65 +860,115 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         }
 
+
+        const prev =
+            document.getElementById(
+                'prev-month'
+            );
+
+        const next =
+            document.getElementById(
+                'next-month'
+            );
+
+
+        if (prev) {
+
+            prev.addEventListener(
+                'click',
+                () => {
+
+                    currentCalendarDate.setMonth(
+                        currentCalendarDate.getMonth() - 1
+                    );
+
+                    renderCalendar();
+
+                }
+            );
+
+        }
+
+
+        if (next) {
+
+            next.addEventListener(
+                'click',
+                () => {
+
+                    currentCalendarDate.setMonth(
+                        currentCalendarDate.getMonth() + 1
+                    );
+
+                    renderCalendar();
+
+                }
+            );
+
+        }
+
     }
+
 
 
     // =========================================================
     // ADD PAGE
     // =========================================================
+
     function initAddPage() {
 
         const addBtn =
-            document.getElementById('add-btn');
+            document.getElementById(
+                'add-btn'
+            );
 
-        const destinationInput =
-            document.getElementById('destination');
-
-        const startDateInput =
-            document.getElementById('start-date');
-
-        const endDateInput =
-            document.getElementById('end-date');
-
-        const activityInput =
-            document.getElementById('activity');
+        if (!addBtn) return;
 
 
-        if (!addBtn) {
-            return;
-        }
+        const destination =
+            document.getElementById(
+                'destination'
+            );
+
+        const startDate =
+            document.getElementById(
+                'start-date'
+            );
+
+        const endDate =
+            document.getElementById(
+                'end-date'
+            );
+
+        const activity =
+            document.getElementById(
+                'activity'
+            );
 
 
         addBtn.addEventListener(
             'click',
             async () => {
 
-                const destination =
-                    destinationInput
-                        ? destinationInput.value.trim()
-                        : '';
+                const destinationValue =
+                    destination.value.trim();
 
-                const startDate =
-                    startDateInput
-                        ? startDateInput.value
-                        : '';
+                const startValue =
+                    startDate.value;
 
-                const endDate =
-                    endDateInput
-                        ? endDateInput.value
-                        : '';
+                const endValue =
+                    endDate.value;
 
-                const activity =
-                    activityInput
-                        ? activityInput.value.trim()
+                const activityValue =
+                    activity
+                        ? activity.value.trim()
                         : '';
 
 
-                // 필수값
                 if (
-                    !destination ||
-                    !startDate ||
-                    !endDate
+                    !destinationValue ||
+                    !startValue ||
+                    !endValue
                 ) {
 
                     alert(
@@ -1660,65 +976,58 @@ document.addEventListener('DOMContentLoaded', async () => {
                     );
 
                     return;
+
                 }
 
 
-                // 날짜 확인
-                if (endDate < startDate) {
+                if (
+                    endValue < startValue
+                ) {
 
                     alert(
                         '종료일은 시작일보다 빠를 수 없습니다.'
                     );
 
                     return;
+
                 }
+
+
+                const id =
+                    String(Date.now());
 
 
                 const newTrip = {
 
-                    id: Date.now(),
+                    id,
 
-                    destination,
+                    destination:
+                        destinationValue,
 
-                    startDate,
+                    startDate:
+                        startValue,
 
-                    endDate,
+                    endDate:
+                        endValue,
 
-                    activity,
+                    activity:
+                        activityValue,
 
                     places: []
+
                 };
 
 
-                try {
-
-                    await db
-                        .collection('trips')
-                        .doc(String(newTrip.id))
-                        .set(newTrip);
-
-
-                    console.log(
-                        '새 일정 저장 완료:',
+                const success =
+                    await saveTrip(
                         newTrip
                     );
 
 
+                if (success) {
+
                     window.location.href =
                         'index.html';
-
-
-                } catch (error) {
-
-                    console.error(
-                        '새 일정 저장 실패:',
-                        error
-                    );
-
-
-                    alert(
-                        '여행 일정 저장에 실패했습니다.'
-                    );
 
                 }
 
@@ -1728,69 +1037,266 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
 
+
     // =========================================================
-    // DETAIL PAGE
+    // ★ DETAIL PAGE
     // =========================================================
+
     async function initDetailPage() {
 
-        await loadTrips();
+        console.log(
+            '===== 상세 페이지 시작 ====='
+        );
 
 
-        const urlParams =
+        // -----------------------------------------
+        // Leaflet 확인
+        // -----------------------------------------
+
+        if (
+            typeof L === 'undefined'
+        ) {
+
+            console.error(
+                'Leaflet이 로드되지 않았습니다.'
+            );
+
+            alert(
+                '지도 라이브러리를 불러오지 못했습니다.'
+            );
+
+            return;
+
+        }
+
+
+        // -----------------------------------------
+        // URL에서 ID 가져오기
+        // -----------------------------------------
+
+        const params =
             new URLSearchParams(
                 window.location.search
             );
 
 
         const tripId =
-            urlParams.get('id');
+            params.get('id');
 
 
-        trip =
-            trips.find(
-                t =>
-                    String(t.id) ===
-                    String(tripId)
-            );
+        console.log(
+            'URL 여행 ID:',
+            tripId
+        );
 
 
-        if (!trip) {
+        if (!tripId) {
 
             alert(
-                '여행 정보를 찾을 수 없습니다.'
+                '여행 ID가 없습니다.'
             );
 
             window.location.href =
                 'index.html';
 
             return;
+
         }
 
 
-        const titleEl =
-            document.getElementById('trip-title');
+        // -----------------------------------------
+        // Firestore 직접 조회
+        // -----------------------------------------
+        //
+        // ★ 여기서 전체 trips를 불러오는 것보다
+        // 해당 문서 하나만 가져오는 게 훨씬 안전함.
+        //
 
-        const datesEl =
-            document.getElementById('trip-dates');
+        try {
+
+            const doc =
+                await db
+                    .collection('trips')
+                    .doc(String(tripId))
+                    .get();
 
 
-        if (titleEl) {
-            titleEl.textContent =
-                trip.destination;
+            if (!doc.exists) {
+
+                console.error(
+                    '여행 문서 없음:',
+                    tripId
+                );
+
+                alert(
+                    '여행 정보를 찾을 수 없습니다.'
+                );
+
+                window.location.href =
+                    'index.html';
+
+                return;
+
+            }
+
+
+            const data =
+                doc.data();
+
+
+            currentTrip = {
+
+                id: String(doc.id),
+
+                destination:
+                    data.destination ||
+                    data.name ||
+                    '',
+
+                startDate:
+                    data.startDate ||
+                    data.date ||
+                    '',
+
+                endDate:
+                    data.endDate ||
+                    data.startDate ||
+                    data.date ||
+                    '',
+
+                activity:
+                    data.activity ||
+                    '',
+
+                places:
+                    Array.isArray(data.places)
+                        ? data.places
+                        : []
+
+            };
+
+
+            console.log(
+                '상세 여행 데이터:',
+                currentTrip
+            );
+
+
+        }
+        catch (error) {
+
+            console.error(
+                '여행 조회 실패:',
+                error
+            );
+
+            alert(
+                '여행 정보를 불러오지 못했습니다.'
+            );
+
+            return;
+
         }
 
 
-        if (datesEl) {
-            datesEl.textContent =
-                `${trip.startDate} ~ ${trip.endDate}`;
+
+        // -----------------------------------------
+        // HTML 요소
+        // -----------------------------------------
+
+        const title =
+            document.getElementById(
+                'trip-title'
+            );
+
+        const dates =
+            document.getElementById(
+                'trip-dates'
+            );
+
+        const placeInput =
+            document.getElementById(
+                'place-input'
+            );
+
+        const addPlaceBtn =
+            document.getElementById(
+                'add-place-btn'
+            );
+
+        const placesList =
+            document.getElementById(
+                'places-list'
+            );
+
+        const optimizeBtn =
+            document.getElementById(
+                'optimize-btn'
+            );
+
+        const mapElement =
+            document.getElementById(
+                'map'
+            );
+
+
+        // -----------------------------------------
+        // 제목
+        // -----------------------------------------
+
+        if (title) {
+
+            title.textContent =
+                currentTrip.destination;
+
         }
 
 
-        // ================================
-        // 지도
-        // ================================
+        if (dates) {
+
+            dates.textContent =
+                `${currentTrip.startDate} ~ ${currentTrip.endDate}`;
+
+        }
+
+
+
+        // =====================================================
+        // ★★★ MAP 초기화 ★★★
+        // =====================================================
+
+        console.log(
+            '지도 초기화 시작'
+        );
+
+
+        if (!mapElement) {
+
+            console.error(
+                '#map 요소가 없습니다.'
+            );
+
+            alert(
+                '지도 영역을 찾을 수 없습니다.'
+            );
+
+            return;
+
+        }
+
+
+        // 지도 높이 확인
+        console.log(
+            '지도 크기:',
+            mapElement.offsetWidth,
+            mapElement.offsetHeight
+        );
+
+
         const map =
-            L.map('map').setView(
+            L.map(
+                mapElement
+            ).setView(
                 [37.5665, 126.9780],
                 10
             );
@@ -1799,628 +1305,110 @@ document.addEventListener('DOMContentLoaded', async () => {
         L.tileLayer(
             'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
             {
+
                 maxZoom: 19,
-                attribution: '&copy; OpenStreetMap'
+
+                attribution:
+                    '&copy; OpenStreetMap contributors'
+
             }
         ).addTo(map);
 
 
-        const placeInput =
-            document.getElementById(
-                'place-input'
-            );
+        console.log(
+            'Leaflet 지도 생성 완료'
+        );
 
 
-        const addPlaceBtn =
-            document.getElementById(
-                'add-place-btn'
-            );
+        // 지도 크기 재계산
+        setTimeout(
+            () => {
 
+                map.invalidateSize();
 
-        const placesList =
-            document.getElementById(
-                'places-list'
-            );
+            },
+            300
+        );
 
-
-        const optimizeBtn =
-            document.getElementById(
-                'optimize-btn'
-            );
-
-
-        if (!trip.places) {
-            trip.places = [];
-        }
-
-
-        renderPlaces();
-
-
-        // ================================
-        // 장소 추가
-        // ================================
-        if (addPlaceBtn) {
-
-            addPlaceBtn.addEventListener(
-                'click',
-                async () => {
-
-                    const placeName =
-                        placeInput
-                            ? placeInput.value.trim()
-                            : '';
-
-
-                    if (!placeName) {
-                        return;
-                    }
-
-
-                    try {
-
-                        const response =
-                            await fetch(
-                                `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(placeName)}`,
-                                {
-                                    headers: {
-                                        'Accept-Language': 'ko'
-                                    }
-                                }
-                            );
-
-
-                        const data =
-                            await response.json();
-
-
-                        if (
-                            !data ||
-                            data.length === 0
-                        ) {
-
-                            alert(
-                                '장소를 찾을 수 없습니다.'
-                            );
-
-                            return;
-                        }
-
-
-                        const result =
-                            data[0];
-
-
-                        const newPlace = {
-
-                            id: Date.now(),
-
-                            name: placeName,
-
-                            lat:
-                                parseFloat(
-                                    result.lat
-                                ),
-
-                            lng:
-                                parseFloat(
-                                    result.lon
-                                ),
-
-                            isLocked: false
-                        };
-
-
-                        trip.places.push(
-                            newPlace
-                        );
-
-
-                        await saveCurrentTrip();
-
-
-                        renderPlaces();
-
-
-                        if (placeInput) {
-                            placeInput.value = '';
-                        }
-
-
-                    } catch (error) {
-
-                        console.error(
-                            '장소 검색 오류:',
-                            error
-                        );
-
-
-                        alert(
-                            '장소 검색 중 오류가 발생했습니다.'
-                        );
-
-                    }
-
-                }
-            );
-
-        }
-
-
-        // ================================
-        // 최적화
-        // ================================
-        if (optimizeBtn) {
-
-            optimizeBtn.addEventListener(
-                'click',
-                optimizeRoute
-            );
-
-        }
-
-
-        async function optimizeRoute() {
-
-            if (
-                !trip.places ||
-                trip.places.length < 2
-            ) {
-
-                alert(
-                    '최적화할 장소가 2개 이상 필요합니다.'
-                );
-
-                return;
-            }
-
-
-            const places =
-                [...trip.places];
-
-
-            const lockedPlaces = [];
-            const unlockedPlaces = [];
-
-
-            places.forEach(
-                (place, index) => {
-
-                    if (place.isLocked) {
-
-                        lockedPlaces.push({
-                            place,
-                            index
-                        });
-
-                    } else {
-
-                        unlockedPlaces.push(
-                            place
-                        );
-
-                    }
-
-                }
-            );
-
-
-            if (unlockedPlaces.length < 2) {
-
-                alert(
-                    '최적화할 수 있는 장소가 2개 이상 필요합니다.'
-                );
-
-                return;
-            }
-
-
-            const originalOrder =
-                JSON.stringify(
-                    places.map(p => p.id)
-                );
-
-
-            // --------------------------------
-            // 잠금 위치 유지
-            // --------------------------------
-            function reconstructRoute(
-                unlocked
-            ) {
-
-                const result =
-                    new Array(
-                        places.length
-                    ).fill(null);
-
-
-                lockedPlaces.forEach(
-                    item => {
-
-                        result[item.index] =
-                            item.place;
-
-                    }
-                );
-
-
-                let index = 0;
-
-
-                for (
-                    let i = 0;
-                    i < result.length;
-                    i++
-                ) {
-
-                    if (result[i] === null) {
-
-                        result[i] =
-                            unlocked[index++];
-
-                    }
-
-                }
-
-
-                return result;
-            }
-
-
-            // --------------------------------
-            // 거리 계산
-            // --------------------------------
-            function calculateDistance(
-                route
-            ) {
-
-                let distance = 0;
-
-
-                for (
-                    let i = 0;
-                    i < route.length - 1;
-                    i++
-                ) {
-
-                    const a =
-                        L.latLng(
-                            route[i].lat,
-                            route[i].lng
-                        );
-
-
-                    const b =
-                        L.latLng(
-                            route[i + 1].lat,
-                            route[i + 1].lng
-                        );
-
-
-                    distance +=
-                        a.distanceTo(b);
-
-                }
-
-
-                return distance;
-            }
-
-
-            let currentSolution =
-                [...unlockedPlaces];
-
-
-            let currentRoute =
-                reconstructRoute(
-                    currentSolution
-                );
-
-
-            let currentDistance =
-                calculateDistance(
-                    currentRoute
-                );
-
-
-            let bestSolution =
-                [...currentSolution];
-
-
-            let bestDistance =
-                currentDistance;
-
-
-            let temperature = 10000;
-
-
-            // --------------------------------
-            // Simulated Annealing
-            // --------------------------------
-            for (
-                let i = 0;
-                i < 2500;
-                i++
-            ) {
-
-                const newSolution =
-                    [...currentSolution];
-
-
-                const idx1 =
-                    Math.floor(
-                        Math.random() *
-                        newSolution.length
-                    );
-
-
-                const idx2 =
-                    Math.floor(
-                        Math.random() *
-                        newSolution.length
-                    );
-
-
-                if (
-                    Math.random() < 0.5 &&
-                    newSolution.length > 2
-                ) {
-
-                    const start =
-                        Math.min(
-                            idx1,
-                            idx2
-                        );
-
-
-                    const end =
-                        Math.max(
-                            idx1,
-                            idx2
-                        );
-
-
-                    const section =
-                        newSolution
-                            .slice(
-                                start,
-                                end + 1
-                            )
-                            .reverse();
-
-
-                    newSolution.splice(
-                        start,
-                        section.length,
-                        ...section
-                    );
-
-
-                } else {
-
-                    [
-                        newSolution[idx1],
-                        newSolution[idx2]
-                    ] =
-                    [
-                        newSolution[idx2],
-                        newSolution[idx1]
-                    ];
-
-                }
-
-
-                const newRoute =
-                    reconstructRoute(
-                        newSolution
-                    );
-
-
-                const newDistance =
-                    calculateDistance(
-                        newRoute
-                    );
-
-
-                const probability =
-                    Math.exp(
-                        (
-                            currentDistance -
-                            newDistance
-                        ) / temperature
-                    );
-
-
-                if (
-                    newDistance <
-                    currentDistance ||
-                    Math.random() <
-                    probability
-                ) {
-
-                    currentSolution =
-                        newSolution;
-
-                    currentDistance =
-                        newDistance;
-
-
-                    if (
-                        newDistance <
-                        bestDistance
-                    ) {
-
-                        bestSolution =
-                            [...newSolution];
-
-                        bestDistance =
-                            newDistance;
-                    }
-
-                }
-
-
-                temperature *= 0.995;
-
-
-                if (
-                    temperature < 0.001
-                ) {
-                    temperature = 0.001;
-                }
-
-            }
-
-
-            trip.places =
-                reconstructRoute(
-                    bestSolution
-                );
-
-
-            await saveCurrentTrip();
-
-
-            renderPlaces();
-
-
-            const newOrder =
-                JSON.stringify(
-                    trip.places.map(
-                        p => p.id
-                    )
-                );
-
-
-            const distanceKm =
-                (
-                    bestDistance / 1000
-                ).toFixed(1);
-
-
-            if (
-                originalOrder ===
-                newOrder
-            ) {
-
-                alert(
-                    `이미 최적의 경로입니다! (총 거리: ${distanceKm}km)`
-                );
-
-            } else {
-
-                alert(
-                    `경로를 최적화했습니다! (총 거리: ${distanceKm}km)`
-                );
-
-            }
-
-        }
-
-
-        // =====================================================
-        // 잠금
-        // =====================================================
-        window.toggleLock =
-            async function(id) {
-
-                const place =
-                    trip.places.find(
-                        p =>
-                            String(p.id) ===
-                            String(id)
-                    );
-
-
-                if (!place) {
-                    return;
-                }
-
-
-                place.isLocked =
-                    !place.isLocked;
-
-
-                await saveCurrentTrip();
-
-
-                renderPlaces();
-            };
-
-
-        // =====================================================
-        // 장소 삭제
-        // =====================================================
-        window.removePlace =
-            async function(id) {
-
-                trip.places =
-                    trip.places.filter(
-                        p =>
-                            String(p.id) !==
-                            String(id)
-                    );
-
-
-                await saveCurrentTrip();
-
-
-                renderPlaces();
-            };
 
 
         // =====================================================
         // 장소 렌더링
         // =====================================================
+
         function renderPlaces() {
 
-            if (!placesList) {
-                return;
-            }
+            console.log(
+                '장소 렌더링:',
+                currentTrip.places
+            );
 
 
             placesList.innerHTML = '';
 
 
-            // 기존 지도 마커/선 제거
-            map.eachLayer(layer => {
+            // 마커/선 제거
+            map.eachLayer(
+                layer => {
 
-                if (
-                    layer instanceof L.Marker ||
-                    layer instanceof L.Polyline
-                ) {
+                    if (
+                        layer instanceof L.Marker ||
+                        layer instanceof L.Polyline
+                    ) {
 
-                    map.removeLayer(layer);
+                        map.removeLayer(layer);
+
+                    }
 
                 }
-
-            });
+            );
 
 
             if (
-                !trip.places ||
-                trip.places.length === 0
+                !currentTrip.places ||
+                currentTrip.places.length === 0
             ) {
 
-                placesList.innerHTML =
-                    '<div class="empty-places"><p>방문할 장소를 추가해보세요!</p></div>';
+                placesList.innerHTML = `
+
+                    <div class="empty-places">
+
+                        <p>
+                            방문할 장소를 추가해보세요!
+                        </p>
+
+                    </div>
+
+                `;
 
                 return;
+
             }
 
 
             const latlngs = [];
 
 
-            trip.places.forEach(
+            currentTrip.places.forEach(
                 (place, index) => {
 
+                    // -------------------------------
+                    // 목록
+                    // -------------------------------
+
                     const item =
-                        document.createElement('div');
+                        document.createElement(
+                            'div'
+                        );
 
 
                     item.className =
-                        `place-item ${place.isLocked ? 'locked' : ''}`;
+                        'place-item' +
+                        (
+                            place.isLocked
+                                ? ' locked'
+                                : ''
+                        );
 
 
                     item.dataset.id =
@@ -2442,15 +1430,21 @@ document.addEventListener('DOMContentLoaded', async () => {
                         </span>
 
                         <button
-                            class="lock-btn ${place.isLocked ? 'active' : ''}"
-                            type="button"
+                            class="lock-btn ${
+                                place.isLocked
+                                    ? 'active'
+                                    : ''
+                            }"
                         >
-                            <i class="fa-solid ${place.isLocked ? 'fa-lock' : 'fa-lock-open'}"></i>
+                            <i class="fa-solid ${
+                                place.isLocked
+                                    ? 'fa-lock'
+                                    : 'fa-lock-open'
+                            }"></i>
                         </button>
 
                         <button
                             class="remove-place-btn"
-                            type="button"
                         >
                             <i class="fa-solid fa-trash"></i>
                         </button>
@@ -2465,21 +1459,21 @@ document.addEventListener('DOMContentLoaded', async () => {
                         );
 
 
-                    if (lockBtn) {
+                    lockBtn.addEventListener(
+                        'click',
+                        async e => {
 
-                        lockBtn.addEventListener(
-                            'click',
-                            event => {
+                            e.stopPropagation();
 
-                                event.stopPropagation();
+                            place.isLocked =
+                                !place.isLocked;
 
-                                window.toggleLock(
-                                    place.id
-                                );
-                            }
-                        );
+                            await saveCurrentTrip();
 
-                    }
+                            renderPlaces();
+
+                        }
+                    );
 
 
                     // 삭제
@@ -2489,21 +1483,35 @@ document.addEventListener('DOMContentLoaded', async () => {
                         );
 
 
-                    if (removeBtn) {
+                    removeBtn.addEventListener(
+                        'click',
+                        async e => {
 
-                        removeBtn.addEventListener(
-                            'click',
-                            event => {
+                            e.stopPropagation();
 
-                                event.stopPropagation();
-
-                                window.removePlace(
-                                    place.id
-                                );
+                            if (
+                                !confirm(
+                                    `"${place.name}" 장소를 삭제할까요?`
+                                )
+                            ) {
+                                return;
                             }
-                        );
 
-                    }
+
+                            currentTrip.places =
+                                currentTrip.places.filter(
+                                    p =>
+                                        String(p.id) !==
+                                        String(place.id)
+                                );
+
+
+                            await saveCurrentTrip();
+
+                            renderPlaces();
+
+                        }
+                    );
 
 
                     // 드래그
@@ -2516,6 +1524,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 item.classList.add(
                                     'dragging'
                                 );
+
                             }
                         );
 
@@ -2528,8 +1537,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                                     'dragging'
                                 );
 
+                                await updateOrder();
 
-                                await updateOrderFromDOM();
                             }
                         );
 
@@ -2539,55 +1548,69 @@ document.addEventListener('DOMContentLoaded', async () => {
                     placesList.appendChild(item);
 
 
-                    // 마커
-                    L.marker(
-                        [
-                            place.lat,
-                            place.lng
-                        ]
-                    )
-                        .addTo(map)
-                        .bindPopup(
-                            `${index + 1}. ${escapeHtml(place.name)}`
+                    // -------------------------------
+                    // 지도 마커
+                    // -------------------------------
+
+                    const lat =
+                        Number(place.lat);
+
+                    const lng =
+                        Number(place.lng);
+
+
+                    if (
+                        Number.isFinite(lat) &&
+                        Number.isFinite(lng)
+                    ) {
+
+                        L.marker(
+                            [lat, lng]
+                        )
+                            .addTo(map)
+                            .bindPopup(
+                                `${index + 1}. ${escapeHtml(place.name)}`
+                            );
+
+
+                        latlngs.push(
+                            [lat, lng]
                         );
 
-
-                    latlngs.push(
-                        [
-                            place.lat,
-                            place.lng
-                        ]
-                    );
+                    }
 
                 }
             );
 
 
+            // -------------------------------
             // 경로
-            if (latlngs.length > 1) {
+            // -------------------------------
+
+            if (
+                latlngs.length > 1
+            ) {
 
                 L.polyline(
-                    latlngs,
-                    {
-                        color: 'blue'
-                    }
+                    latlngs
                 ).addTo(map);
 
 
                 map.fitBounds(
                     latlngs,
                     {
-                        padding: [30, 30]
+                        padding: [40, 40]
                     }
                 );
 
-            } else if (
+            }
+            else if (
                 latlngs.length === 1
             ) {
 
                 map.setView(
                     latlngs[0],
-                    13
+                    14
                 );
 
             }
@@ -2595,50 +1618,200 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
 
+
         // =====================================================
-        // 드래그 정렬
+        // 현재 여행 저장
         // =====================================================
-        if (placesList) {
 
-            placesList.addEventListener(
-                'dragover',
-                event => {
+        async function saveCurrentTrip() {
 
-                    event.preventDefault();
+            return await saveTrip(
+                currentTrip
+            );
 
-
-                    const dragging =
-                        placesList.querySelector(
-                            '.dragging'
-                        );
+        }
 
 
-                    if (!dragging) {
-                        return;
-                    }
+
+        // =====================================================
+        // 장소 추가
+        // =====================================================
+
+        async function addPlace() {
+
+            const name =
+                placeInput.value.trim();
 
 
-                    const afterElement =
-                        getDragAfterElement(
-                            placesList,
-                            event.clientY
-                        );
+            if (!name) {
 
+                alert(
+                    '장소를 입력해주세요.'
+                );
+
+                return;
+
+            }
+
+
+            addPlaceBtn.disabled =
+                true;
+
+
+            try {
+
+                console.log(
+                    '장소 검색:',
+                    name
+                );
+
+
+                const url =
+                    'https://nominatim.openstreetmap.org/search' +
+                    '?format=json' +
+                    '&limit=1' +
+                    '&q=' +
+                    encodeURIComponent(name);
+
+
+                const response =
+                    await fetch(
+                        url,
+                        {
+                            headers: {
+                                'Accept':
+                                    'application/json'
+                            }
+                        }
+                    );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        `HTTP ${response.status}`
+                    );
+
+                }
+
+
+                const data =
+                    await response.json();
+
+
+                console.log(
+                    '검색 결과:',
+                    data
+                );
+
+
+                if (
+                    !data ||
+                    data.length === 0
+                ) {
+
+                    alert(
+                        '장소를 찾을 수 없습니다.'
+                    );
+
+                    return;
+
+                }
+
+
+                const result =
+                    data[0];
+
+
+                const newPlace = {
+
+                    id:
+                        String(Date.now()),
+
+                    name,
+
+                    lat:
+                        Number(result.lat),
+
+                    lng:
+                        Number(result.lon),
+
+                    isLocked:
+                        false
+
+                };
+
+
+                currentTrip.places.push(
+                    newPlace
+                );
+
+
+                const success =
+                    await saveCurrentTrip();
+
+
+                if (!success) {
+
+                    // 저장 실패하면 되돌림
+                    currentTrip.places.pop();
+
+                    return;
+
+                }
+
+
+                placeInput.value = '';
+
+                renderPlaces();
+
+
+            }
+            catch (error) {
+
+                console.error(
+                    '장소 추가 오류:',
+                    error
+                );
+
+                alert(
+                    '장소 검색 중 오류가 발생했습니다.'
+                );
+
+            }
+            finally {
+
+                addPlaceBtn.disabled =
+                    false;
+
+            }
+
+        }
+
+
+        if (addPlaceBtn) {
+
+            addPlaceBtn.addEventListener(
+                'click',
+                addPlace
+            );
+
+        }
+
+
+        if (placeInput) {
+
+            placeInput.addEventListener(
+                'keydown',
+                e => {
 
                     if (
-                        afterElement === null
+                        e.key === 'Enter'
                     ) {
 
-                        placesList.appendChild(
-                            dragging
-                        );
+                        e.preventDefault();
 
-                    } else {
-
-                        placesList.insertBefore(
-                            dragging,
-                            afterElement
-                        );
+                        addPlace();
 
                     }
 
@@ -2646,6 +1819,54 @@ document.addEventListener('DOMContentLoaded', async () => {
             );
 
         }
+
+
+
+        // =====================================================
+        // 드래그 정렬
+        // =====================================================
+
+        placesList.addEventListener(
+            'dragover',
+            e => {
+
+                e.preventDefault();
+
+
+                const dragging =
+                    placesList.querySelector(
+                        '.dragging'
+                    );
+
+
+                if (!dragging) return;
+
+
+                const after =
+                    getDragAfterElement(
+                        placesList,
+                        e.clientY
+                    );
+
+
+                if (!after) {
+
+                    placesList.appendChild(
+                        dragging
+                    );
+
+                }
+                else {
+
+                    placesList.insertBefore(
+                        dragging,
+                        after
+                    );
+
+                }
+
+            }
+        );
 
 
         function getDragAfterElement(
@@ -2656,7 +1877,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const elements =
                 [
                     ...container.querySelectorAll(
-                        '.place-item:not(.dragging):not(.locked)'
+                        '.place-item:not(.dragging)'
                     )
                 ];
 
@@ -2664,6 +1885,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             let closest = {
                 offset:
                     Number.NEGATIVE_INFINITY,
+
                 element:
                     null
             };
@@ -2684,8 +1906,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                     if (
                         offset < 0 &&
-                        offset >
-                        closest.offset
+                        offset > closest.offset
                     ) {
 
                         closest = {
@@ -2704,346 +1925,350 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
 
-        // =====================================================
-        // DOM → places 배열
-        // =====================================================
-        async function updateOrderFromDOM() {
 
-            if (!placesList) {
-                return;
-            }
+        async function updateOrder() {
 
-
-            const domItems =
-                [
-                    ...placesList.querySelectorAll(
-                        '.place-item'
-                    )
-                ];
-
-
-            const placeMap =
-                new Map(
-                    trip.places.map(
-                        p => [
-                            String(p.id),
-                            p
-                        ]
-                    )
+            const items =
+                placesList.querySelectorAll(
+                    '.place-item'
                 );
 
 
-            const newOrder =
-                [];
+            const ids =
+                [...items].map(
+                    item =>
+                        String(
+                            item.dataset.id
+                        )
+                );
 
 
-            domItems.forEach(item => {
-
-                const id =
-                    item.dataset.id;
+            const reordered = [];
 
 
-                const place =
-                    placeMap.get(
-                        String(id)
+            ids.forEach(id => {
+
+                const found =
+                    currentTrip.places.find(
+                        p =>
+                            String(p.id) === id
                     );
 
 
-                if (place) {
-                    newOrder.push(place);
+                if (found) {
+
+                    reordered.push(
+                        found
+                    );
+
                 }
 
             });
 
 
             if (
-                newOrder.length !==
-                trip.places.length
+                reordered.length ===
+                currentTrip.places.length
             ) {
-                return;
+
+                currentTrip.places =
+                    reordered;
+
+                await saveCurrentTrip();
+
+                renderPlaces();
+
             }
-
-
-            trip.places =
-                newOrder;
-
-
-            await saveCurrentTrip();
-
-
-            renderPlaces();
 
         }
 
 
-        // =====================================================
-        // 현재 여행 저장
-        // =====================================================
-        async function saveCurrentTrip() {
 
-            if (!trip) {
+        // =====================================================
+        // 경로 최적화
+        // =====================================================
+
+        if (optimizeBtn) {
+
+            optimizeBtn.addEventListener(
+                'click',
+                optimizeRoute
+            );
+
+        }
+
+
+        async function optimizeRoute() {
+
+            const places =
+                currentTrip.places;
+
+
+            if (
+                !places ||
+                places.length < 2
+            ) {
+
+                alert(
+                    '최적화할 장소가 2개 이상 필요합니다.'
+                );
+
                 return;
+
             }
 
 
-            try {
-
-                await db
-                    .collection('trips')
-                    .doc(String(trip.id))
-                    .set(
-                        {
-                            id: trip.id,
-                            destination:
-                                trip.destination,
-                            startDate:
-                                trip.startDate,
-                            endDate:
-                                trip.endDate,
-                            activity:
-                                trip.activity || '',
-                            places:
-                                trip.places || []
-                        },
-                        {
-                            merge: true
-                        }
-                    );
+            const unlocked =
+                places.filter(
+                    p => !p.isLocked
+                );
 
 
-                // 메모리 trips도 갱신
-                const index =
-                    trips.findIndex(
-                        t =>
-                            String(t.id) ===
-                            String(trip.id)
-                    );
+            if (
+                unlocked.length < 2
+            ) {
+
+                alert(
+                    '잠금 해제된 장소가 2개 이상 필요합니다.'
+                );
+
+                return;
+
+            }
 
 
-                if (index !== -1) {
+            // 가장 단순하고 안정적인 최근접 이웃 방식
+            const locked =
+                places.filter(
+                    p => p.isLocked
+                );
 
-                    trips[index] = {
-                        ...trip
-                    };
+
+            const unlockedCopy =
+                [...unlocked];
+
+
+            const result = [];
+
+
+            // 첫 번째 장소
+            let current =
+                unlockedCopy.shift();
+
+
+            result.push(current);
+
+
+            while (
+                unlockedCopy.length > 0
+            ) {
+
+                let nearestIndex = 0;
+                let nearestDistance =
+                    Infinity;
+
+
+                for (
+                    let i = 0;
+                    i < unlockedCopy.length;
+                    i++
+                ) {
+
+                    const distance =
+                        calculateDistance(
+                            current,
+                            unlockedCopy[i]
+                        );
+
+
+                    if (
+                        distance <
+                        nearestDistance
+                    ) {
+
+                        nearestDistance =
+                            distance;
+
+                        nearestIndex =
+                            i;
+
+                    }
 
                 }
 
 
-                console.log(
-                    '현재 여행 저장 완료'
-                );
+                current =
+                    unlockedCopy.splice(
+                        nearestIndex,
+                        1
+                    )[0];
 
 
-            } catch (error) {
-
-                console.error(
-                    '현재 여행 저장 실패:',
-                    error
-                );
-
-
-                alert(
-                    '여행 정보 저장에 실패했습니다.'
+                result.push(
+                    current
                 );
 
             }
 
-        }
 
-    }
-
-
-    // =========================================================
-    // Firestore에서 여행 목록 불러오기
-    // =========================================================
-    async function loadTrips() {
-
-        try {
-
-            const snapshot =
-                await db
-                    .collection('trips')
-                    .get();
+            // 잠긴 장소는 기존 위치 유지
+            const finalRoute =
+                new Array(
+                    places.length
+                ).fill(null);
 
 
-            trips =
-                snapshot.docs.map(doc => {
+            places.forEach(
+                (p, index) => {
 
-                    const data =
-                        doc.data();
+                    if (p.isLocked) {
 
+                        finalRoute[index] =
+                            p;
 
-                    console.log(
-                        'Firestore 문서:',
-                        doc.id,
-                        data
-                    );
-
-
-                    return {
-
-                        // 중요:
-                        // Firestore 문서 ID는 문자열
-                        id: String(doc.id),
-
-                        destination:
-                            data.destination ||
-                            data.name ||
-                            '',
-
-                        startDate:
-                            data.startDate ||
-                            data.date ||
-                            '',
-
-                        endDate:
-                            data.endDate ||
-                            data.startDate ||
-                            data.date ||
-                            '',
-
-                        activity:
-                            data.activity ||
-                            '',
-
-                        places:
-                            Array.isArray(
-                                data.places
-                            )
-                                ? data.places
-                                : []
-
-                    };
-
-                });
-
-
-            console.log(
-                '최종 trips:',
-                trips
-            );
-
-
-            return trips;
-
-
-        } catch (error) {
-
-            console.error(
-                'Firestore에서 일정 불러오기 실패:',
-                error
-            );
-
-
-            alert(
-                '여행 일정을 불러오지 못했습니다.'
-            );
-
-
-            trips = [];
-
-
-            return trips;
-        }
-
-    }
-
-
-    // =========================================================
-    // 여행 전체 저장
-    // =========================================================
-    async function saveTrips() {
-
-        try {
-
-            const batch =
-                db.batch();
-
-
-            trips.forEach(t => {
-
-                const docRef =
-                    db
-                        .collection('trips')
-                        .doc(String(t.id));
-
-
-                batch.set(
-                    docRef,
-                    {
-                        id: t.id,
-                        destination:
-                            t.destination,
-                        startDate:
-                            t.startDate,
-                        endDate:
-                            t.endDate,
-                        activity:
-                            t.activity || '',
-                        places:
-                            t.places || []
-                    },
-                    {
-                        merge: true
                     }
-                );
 
-            });
-
-
-            await batch.commit();
-
-
-            console.log(
-                'Firestore 저장 완료'
+                }
             );
 
 
-        } catch (error) {
+            let resultIndex = 0;
 
-            console.error(
-                'Firestore 저장 실패:',
-                error
-            );
+
+            for (
+                let i = 0;
+                i < finalRoute.length;
+                i++
+            ) {
+
+                if (
+                    finalRoute[i] === null
+                ) {
+
+                    finalRoute[i] =
+                        result[resultIndex++];
+
+                }
+
+            }
+
+
+            currentTrip.places =
+                finalRoute;
+
+
+            await saveCurrentTrip();
+
+            renderPlaces();
 
 
             alert(
-                '여행 일정 저장에 실패했습니다.'
+                '경로를 최적화했습니다!'
             );
 
         }
 
-    }
 
 
-    // =========================================================
-    // 상세 페이지 이동
-    // =========================================================
-    function goToDetail(id) {
+        function calculateDistance(
+            a,
+            b
+        ) {
+
+            const lat1 =
+                Number(a.lat);
+
+            const lng1 =
+                Number(a.lng);
+
+            const lat2 =
+                Number(b.lat);
+
+            const lng2 =
+                Number(b.lng);
+
+
+            if (
+                !Number.isFinite(lat1) ||
+                !Number.isFinite(lat2)
+            ) {
+
+                return Infinity;
+
+            }
+
+
+            const R = 6371;
+
+
+            const dLat =
+                toRad(lat2 - lat1);
+
+            const dLng =
+                toRad(lng2 - lng1);
+
+
+            const x =
+                Math.sin(dLat / 2) *
+                Math.sin(dLat / 2) +
+                Math.cos(toRad(lat1)) *
+                Math.cos(toRad(lat2)) *
+                Math.sin(dLng / 2) *
+                Math.sin(dLng / 2);
+
+
+            return (
+                R *
+                2 *
+                Math.atan2(
+                    Math.sqrt(x),
+                    Math.sqrt(1 - x)
+                )
+            );
+
+        }
+
+
+        function toRad(value) {
+
+            return value *
+                Math.PI /
+                180;
+
+        }
+
+
+
+        // =====================================================
+        // ★ 마지막으로 장소 렌더링
+        // =====================================================
+
+        renderPlaces();
+
 
         console.log(
-            '상세 페이지 이동:',
-            id
+            '===== 상세 페이지 초기화 완료 ====='
         );
-
-
-        window.location.href =
-            `trip_detail.html?id=${encodeURIComponent(String(id))}`;
 
     }
 
 
+
     // =========================================================
-    // HTML 문자 처리
+    // HTML escape
     // =========================================================
+
     function escapeHtml(value) {
 
-        return String(value ?? '')
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#039;');
+        const div =
+            document.createElement(
+                'div'
+            );
+
+        div.textContent =
+            value ?? '';
+
+        return div.innerHTML;
 
     }
 
