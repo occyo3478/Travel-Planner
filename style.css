@@ -1219,3 +1219,42 @@ body {
         display: none;
     }
 }
+
+/* PC */
+.mobile-logo {
+    display: none;
+}
+
+/* PC 사이드바 로고 */
+.logo-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo-icon {
+    color: #2864e8;
+    font-size: 32px;
+}
+
+.logo-area h1 {
+    font-size: 28px;
+    margin: 0;
+}
+
+.logo-area .highlight {
+    color: #2864e8;
+}
+
+/* 모바일 */
+@media (max-width: 768px) {
+    .logo-area {
+        display: none;
+    }
+
+    .mobile-logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+}
