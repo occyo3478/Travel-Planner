@@ -1,30 +1,17 @@
 :root {
     --primary-color: #2563eb;
     --primary-hover: #1d4ed8;
-
     --bg-color: #f1f5f9;
-    --bg-light: #f8fafc;
-
     --sidebar-bg: #ffffff;
-
     --text-main: #1e293b;
     --text-muted: #64748b;
-
     --border-color: #e2e8f0;
-
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-
     --font-main: 'Inter', 'Noto Sans KR', sans-serif;
-
     --radius-md: 0.75rem;
 }
-
-
-/* =========================================================
-   RESET
-   ========================================================= */
 
 * {
     margin: 0;
@@ -32,82 +19,34 @@
     box-sizing: border-box;
 }
 
-html {
-    width: 100%;
-    min-height: 100%;
-}
-
 body {
-    width: 100%;
-    min-height: 100vh;
-
     font-family: var(--font-main);
     background-color: var(--bg-color);
     color: var(--text-main);
-
+    height: 100vh;
     overflow: hidden;
 }
 
-
-/* =========================================================
-   COMMON
-   ========================================================= */
-
-button,
-input,
-select {
-    font-family: inherit;
-}
-
-button {
-    cursor: pointer;
-}
-
-a {
-    color: inherit;
-}
-
-
-/* =========================================================
-   MAIN PAGE
-   ========================================================= */
-
 .app-container {
     display: flex;
-    width: 100%;
     height: 100vh;
 }
 
-
-/* =========================================================
-   SIDEBAR
-   ========================================================= */
-
+/* Sidebar */
 .sidebar {
     width: 320px;
-    height: 100vh;
-
-    flex-shrink: 0;
-
     background-color: var(--sidebar-bg);
     border-right: 1px solid var(--border-color);
-
     display: flex;
     flex-direction: column;
-
     padding: 1.5rem;
-
     z-index: 10;
 }
-
-
-/* Logo */
 
 .logo-area {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-
     margin-bottom: 2rem;
 }
 
@@ -126,24 +65,17 @@ a {
     color: var(--primary-color);
 }
 
-
-/* Places section */
-
 .places-section {
     flex: 1;
-
     display: flex;
     flex-direction: column;
-
     min-height: 0;
-
     overflow: hidden;
 }
 
 .section-header h2 {
     font-size: 1rem;
     font-weight: 600;
-
     margin-bottom: 1rem;
 }
 
@@ -153,47 +85,29 @@ a {
 
 .filter-label {
     display: block;
-
     font-size: 0.875rem;
     font-weight: 500;
-
     color: var(--text-muted);
-
     margin-bottom: 0.5rem;
 }
-
-
-/* Inputs */
 
 .input-group input,
 .input-group select {
     width: 100%;
-
     padding: 0.75rem;
-
     border: 1px solid var(--border-color);
     border-radius: 0.5rem;
-
     font-family: var(--font-main);
     font-size: 0.9rem;
-
-    background-color: white;
-
     transition: all 0.2s;
 }
 
 .input-group input:focus,
 .input-group select:focus {
     outline: none;
-
     border-color: var(--primary-color);
-
-    box-shadow:
-        0 0 0 3px rgba(37, 99, 235, 0.1);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
-
-
-/* Period */
 
 .period-search-group {
     margin-top: 1rem;
@@ -204,34 +118,20 @@ a {
     gap: 0.5rem;
 }
 
-
-/* =========================================================
-   BUTTONS
-   ========================================================= */
-
 .btn-primary {
     width: 100%;
-
     padding: 0.75rem;
-
     background-color: var(--primary-color);
     color: white;
-
     border: none;
     border-radius: 0.5rem;
-
     font-weight: 600;
-
     cursor: pointer;
-
     transition: background-color 0.2s;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     gap: 0.5rem;
-
     text-decoration: none;
 }
 
@@ -239,30 +139,20 @@ a {
     background-color: var(--primary-hover);
 }
 
-
 .btn-secondary {
     width: 100%;
-
     padding: 0.75rem;
-
     background-color: white;
     color: var(--text-main);
-
     border: 1px solid var(--border-color);
     border-radius: 0.5rem;
-
     font-weight: 600;
-
     cursor: pointer;
-
     transition: all 0.2s;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     gap: 0.5rem;
-
     margin-top: 1rem;
 }
 
@@ -271,104 +161,58 @@ a {
     border-color: #cbd5e1;
 }
 
-
-/* =========================================================
-   SIDEBAR ACTIONS
-   ========================================================= */
-
 .sidebar-actions {
     margin-top: 1rem;
-
     padding-top: 1rem;
-
     border-top: 1px solid var(--border-color);
 }
 
-
-/* =========================================================
-   TRIP STATS
-   ========================================================= */
-
 .trip-stats {
     display: grid;
-
-    grid-template-columns:
-        1fr 1fr 1fr;
-
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 0.5rem;
-
     margin-top: auto;
-
     padding-top: 1rem;
 }
 
 .stat-card {
     background-color: #f8fafc;
-
     border: 1px solid var(--border-color);
-
     padding: 0.75rem 0.5rem;
-
     border-radius: 0.5rem;
-
     text-align: center;
 }
 
 .stat-number {
     display: block;
-
     font-size: 1.25rem;
     font-weight: 700;
-
     color: var(--primary-color);
 }
 
 .stat-label {
     font-size: 0.7rem;
-
     color: var(--text-muted);
 }
 
-
-/* =========================================================
-   MAIN CONTENT
-   ========================================================= */
-
+/* Main Content */
 .main-content {
     flex: 1;
-    min-width: 0;
-
-    height: 100vh;
-
     display: flex;
     flex-direction: column;
-
     overflow: hidden;
 }
 
-
-/* =========================================================
-   TOP BAR
-   ========================================================= */
-
 .top-bar {
     height: 80px;
-    min-height: 80px;
-
     padding: 0 2rem;
-
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     background-color: rgba(248, 250, 252, 0.8);
-
     backdrop-filter: blur(10px);
-
     border-bottom: 1px solid var(--border-color);
-
     position: relative;
-
     z-index: 50;
 }
 
@@ -379,38 +223,23 @@ a {
 
 .user-welcome p {
     font-size: 0.875rem;
-
     color: var(--text-muted);
 }
 
-
-/* =========================================================
-   TOP BAR ACTIONS
-   ========================================================= */
-
 .actions {
     display: flex;
-
     align-items: center;
-
     gap: 1rem;
 }
 
 .btn-icon {
     background: none;
-
     border: none;
-
     font-size: 1.25rem;
-
     color: var(--text-muted);
-
     cursor: pointer;
-
     padding: 0.5rem;
-
     border-radius: 50%;
-
     transition: background-color 0.2s;
 }
 
@@ -418,321 +247,180 @@ a {
     background-color: #e2e8f0;
 }
 
-
-/* =========================================================
-   PROFILE IMAGE
-   ========================================================= */
-
-.user-profile {
-    position: relative;
-
-    cursor: pointer;
-}
-
 .user-profile img {
     width: 40px;
     height: 40px;
-
     border-radius: 50%;
-
     border: 2px solid white;
-
     box-shadow: var(--shadow-sm);
-
-    display: block;
 }
 
-
-/* =========================================================
-   CONTENT AREA
-   ========================================================= */
-
+/* Content Area */
 .content-area {
     flex: 1;
-    min-height: 0;
-
     padding: 2rem;
-
     overflow-y: auto;
 }
 
-
-/* =========================================================
-   SECTION HEADER
-   ========================================================= */
-
 .section-header {
     display: flex;
-
     justify-content: space-between;
     align-items: center;
-
     margin-bottom: 1.5rem;
 }
 
-
-/* =========================================================
-   TABS
-   ========================================================= */
-
 .tab-container {
     display: flex;
-
     gap: 1rem;
 }
 
 .tab-btn {
     background: none;
-
     border: none;
-
     font-size: 1rem;
     font-weight: 600;
-
     color: var(--text-muted);
-
     cursor: pointer;
-
     padding-bottom: 0.25rem;
-
     border-bottom: 2px solid transparent;
-
     transition: all 0.2s;
 }
 
 .tab-btn.active {
     color: var(--text-main);
-
     border-bottom-color: var(--primary-color);
 }
 
-
-/* =========================================================
-   VIEW OPTIONS
-   ========================================================= */
-
 .view-options {
     display: flex;
-
     background-color: white;
-
     padding: 0.25rem;
-
     border-radius: 0.5rem;
-
     border: 1px solid var(--border-color);
 }
 
 .view-btn {
     background: none;
-
     border: none;
-
     padding: 0.5rem 0.75rem;
-
     border-radius: 0.25rem;
-
     color: var(--text-muted);
-
     cursor: pointer;
-
     transition: all 0.2s;
 }
 
 .view-btn.active {
     background-color: var(--bg-color);
-
     color: var(--primary-color);
 }
 
-
-/* =========================================================
-   TRIP LIST
-   ========================================================= */
-
+/* Trip List */
 .trip-list {
     display: flex;
-
     flex-direction: column;
-
     gap: 1rem;
 }
 
-
-/* =========================================================
-   TRIP CARD
-   ========================================================= */
-
 .trip-card {
     background-color: white;
-
     border: 1px solid var(--border-color);
-
     border-radius: var(--radius-md);
-
     padding: 1.5rem;
-
     cursor: pointer;
-
     transition: all 0.2s;
-
     box-shadow: var(--shadow-sm);
-
     width: 100%;
-
     display: flex;
-
     justify-content: space-between;
     align-items: center;
-
     gap: 1rem;
 }
 
 .trip-card:hover {
     transform: translateY(-2px);
-
     box-shadow: var(--shadow-md);
-
     border-color: var(--primary-color);
 }
 
 .trip-info {
     display: flex;
-
     justify-content: space-between;
     align-items: center;
-
     flex: 1;
+}
 
-    min-width: 0;
+.delete-trip-btn {
+    background: none;
+    border: none;
+    color: #cbd5e1;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    transition: all 0.2s;
+    font-size: 1rem;
+}
+
+.delete-trip-btn:hover {
+    color: #ef4444;
+    background-color: #fee2e2;
 }
 
 .trip-info h3 {
     font-size: 1.1rem;
-
     font-weight: 600;
-
     margin: 0;
 }
 
 .trip-info p {
     color: var(--text-muted);
-
     font-size: 0.9rem;
-
     margin: 0;
 }
 
-
-/* =========================================================
-   DELETE TRIP
-   ========================================================= */
-
-.delete-trip-btn {
-    background: none;
-
-    border: none;
-
-    color: #cbd5e1;
-
-    cursor: pointer;
-
-    padding: 0.5rem;
-
-    border-radius: 0.25rem;
-
-    transition: all 0.2s;
-
-    font-size: 1rem;
-
-    flex-shrink: 0;
-}
-
-.delete-trip-btn:hover {
-    color: #ef4444;
-
-    background-color: #fee2e2;
-}
-
-
-/* =========================================================
-   EMPTY STATE
-   ========================================================= */
-
 .empty-state {
     grid-column: 1 / -1;
-
     display: flex;
-
     flex-direction: column;
-
     align-items: center;
     justify-content: center;
-
     padding: 4rem;
-
     background-color: white;
-
     border-radius: var(--radius-md);
-
     border: 2px dashed var(--border-color);
-
     color: var(--text-muted);
-
     text-align: center;
 }
 
 .empty-state i {
     font-size: 3rem;
-
     margin-bottom: 1rem;
-
     color: #cbd5e1;
 }
 
-
-/* =========================================================
-   CALENDAR
-   ========================================================= */
-
+/* Calendar View */
 .calendar-view-container {
     background-color: white;
-
     border-radius: var(--radius-md);
-
     border: 1px solid var(--border-color);
-
     padding: 1.5rem;
-
     display: flex;
-
     flex-direction: column;
-
     height: 600px;
-
-    min-height: 0;
 }
 
 .calendar-controls {
     display: flex;
-
     justify-content: space-between;
     align-items: center;
-
     margin-bottom: 1.5rem;
 }
 
 .cal-nav-btn {
     background: none;
-
     border: 1px solid var(--border-color);
-
     border-radius: 0.5rem;
-
     padding: 0.5rem 0.75rem;
-
     cursor: pointer;
-
     color: var(--text-muted);
 }
 
@@ -742,33 +430,19 @@ a {
 
 .calendar-grid {
     display: grid;
-
-    grid-template-columns:
-        repeat(7, 1fr);
-
+    grid-template-columns: repeat(7, 1fr);
     gap: 1px;
-
     background-color: var(--border-color);
-
     border: 1px solid var(--border-color);
-
     flex: 1;
-
-    min-height: 0;
 }
 
 .calendar-day {
     background-color: white;
-
     padding: 0.5rem;
-
     min-height: 80px;
-
     font-size: 0.9rem;
-
     color: var(--text-main);
-
-    overflow: hidden;
 }
 
 .calendar-day.empty {
@@ -779,34 +453,19 @@ a {
     background-color: white;
 }
 
-
-/* Calendar trip label */
-
 .trip-label {
     display: block;
-
     background-color: var(--primary-color);
-
     color: white;
-
     font-size: 0.75rem;
-
     padding: 2px 6px;
-
     border-radius: 4px;
-
     margin-top: 4px;
-
     white-space: nowrap;
-
     overflow: hidden;
-
     text-overflow: ellipsis;
-
     font-weight: 500;
-
     cursor: pointer;
-
     transition: background-color 0.2s;
 }
 
@@ -814,73 +473,49 @@ a {
     background-color: var(--primary-hover);
 }
 
-
-/* =========================================================
-   NOTIFICATION
-   ========================================================= */
-
+/* Notification Dropdown */
 .notification-container {
     position: relative;
 }
 
 .notification-dropdown {
     position: absolute;
-
     top: 120%;
     right: 0;
-
     width: 300px;
-
     background-color: white;
-
     border: 1px solid var(--border-color);
-
     border-radius: var(--radius-md);
-
     box-shadow: var(--shadow-lg);
-
     opacity: 0;
-
     visibility: hidden;
-
     transform: translateY(-10px);
-
     transition: all 0.2s ease;
-
     z-index: 100;
 }
 
 .notification-dropdown.show {
     opacity: 1;
-
     visibility: visible;
-
     transform: translateY(0);
 }
 
 .notification-header {
     padding: 1rem;
-
     font-weight: 600;
-
     border-bottom: 1px solid var(--border-color);
 }
 
 .notification-list {
     list-style: none;
-
     max-height: 300px;
-
     overflow-y: auto;
 }
 
 .notification-item {
     padding: 1rem;
-
     border-bottom: 1px solid var(--border-color);
-
     cursor: pointer;
-
     transition: background-color 0.2s;
 }
 
@@ -890,33 +525,24 @@ a {
 
 .noti-content {
     display: flex;
-
     align-items: center;
-
     gap: 0.75rem;
 }
 
 .d-day-badge {
     padding: 0.25rem 0.5rem;
-
     border-radius: 0.25rem;
-
     font-size: 0.75rem;
-
     font-weight: 700;
-
-    flex-shrink: 0;
 }
 
 .d-day-today {
     background-color: #fee2e2;
-
     color: #ef4444;
 }
 
 .d-day-upcoming {
     background-color: #dbeafe;
-
     color: #2563eb;
 }
 
@@ -926,103 +552,72 @@ a {
 
 .empty-noti {
     padding: 2rem 1rem;
-
     text-align: center;
-
     color: var(--text-muted);
-
     font-size: 0.9rem;
 }
 
-
-/* =========================================================
-   PROFILE DROPDOWN
-   ========================================================= */
+/* Profile Dropdown */
+.user-profile {
+    position: relative;
+    cursor: pointer;
+}
 
 .profile-dropdown {
     position: absolute;
-
     top: 120%;
     right: 0;
-
     width: 220px;
-
     background-color: white;
-
     border: 1px solid var(--border-color);
-
     border-radius: var(--radius-md);
-
     box-shadow: var(--shadow-lg);
-
     opacity: 0;
-
     visibility: hidden;
-
     transform: translateY(-10px);
-
     transition: all 0.2s ease;
-
     z-index: 1000;
-
     overflow: hidden;
 }
 
 .profile-dropdown.show {
     opacity: 1;
-
     visibility: visible;
-
     transform: translateY(0);
 }
 
 .profile-header {
     padding: 1rem;
-
     background-color: var(--bg-light);
-
     border-bottom: 1px solid var(--border-color);
 }
 
 .profile-header strong {
     display: block;
-
     color: var(--text-main);
-
     font-size: 0.95rem;
 }
 
 .profile-header span {
     display: block;
-
     color: var(--text-muted);
-
     font-size: 0.8rem;
-
     margin-top: 0.2rem;
 }
 
 .profile-menu {
     list-style: none;
-
     padding: 0.5rem 0;
 }
 
 .profile-menu li a {
     display: flex;
-
     align-items: center;
-
     gap: 0.75rem;
-
     padding: 0.75rem 1rem;
-
     color: var(--text-main);
-
     text-decoration: none;
-
     font-size: 0.9rem;
-
     transition: background-color 0.2s;
 }
 
@@ -1032,17 +627,13 @@ a {
 
 .profile-menu li a i {
     width: 16px;
-
     text-align: center;
-
     color: var(--text-muted);
 }
 
 .profile-menu li.divider {
     height: 1px;
-
     background-color: var(--border-color);
-
     margin: 0.5rem 0;
 }
 
@@ -1058,74 +649,36 @@ a {
     color: #ef4444;
 }
 
-
-/* =========================================================
-   DETAIL PAGE
-   ========================================================= */
-
+/* Detail Page */
 .detail-page-container {
     display: flex;
-
-    width: 100%;
-
     height: 100vh;
-
-    overflow: hidden;
 }
-
-
-/* =========================================================
-   DETAIL SIDEBAR
-   ========================================================= */
 
 .detail-sidebar {
     width: 360px;
-
-    height: 100vh;
-
-    flex-shrink: 0;
-
     background-color: white;
-
     border-right: 1px solid var(--border-color);
-
     display: flex;
-
     flex-direction: column;
-
     z-index: 10;
-
     box-shadow: var(--shadow-md);
 }
 
-
-/* Detail header */
-
 .detail-header {
     padding: 1.5rem;
-
     border-bottom: 1px solid var(--border-color);
-
     background-color: white;
-
-    flex-shrink: 0;
 }
 
 .back-link {
     display: inline-flex;
-
     align-items: center;
-
     gap: 0.5rem;
-
     color: var(--text-muted);
-
     text-decoration: none;
-
     font-size: 0.9rem;
-
     margin-bottom: 1rem;
-
     transition: color 0.2s;
 }
 
@@ -1135,186 +688,103 @@ a {
 
 .trip-dates {
     color: var(--text-muted);
-
     font-size: 0.9rem;
-
     margin-top: 0.25rem;
 }
 
-
-/* =========================================================
-   DETAIL PLACES
-   ========================================================= */
-
+/* Places List in Detail Page */
 .detail-sidebar .places-section {
     flex: 1;
-
     display: flex;
-
     flex-direction: column;
-
-    min-height: 0;
-
     padding: 1.5rem;
-
     background-color: #f8fafc;
-
     overflow: hidden;
 }
 
 .detail-sidebar .add-place-form {
     display: flex;
-
     gap: 0.5rem;
-
     margin-bottom: 1rem;
-
-    flex-shrink: 0;
 }
 
 .detail-sidebar .add-place-form input {
     flex: 1;
-
-    min-width: 0;
-
     padding: 0.75rem;
-
     border: 1px solid var(--border-color);
-
     border-radius: 0.5rem;
-
-    background-color: white;
 }
 
 .detail-sidebar .add-place-form button {
     padding: 0.75rem 1rem;
-
     background-color: var(--primary-color);
-
     color: white;
-
     border: none;
-
     border-radius: 0.5rem;
-
     cursor: pointer;
-
-    flex-shrink: 0;
 }
-
-
-/* Places list */
 
 .places-list {
     flex: 1;
-
-    min-height: 0;
-
     overflow-y: auto;
-
     display: flex;
-
     flex-direction: column;
-
     gap: 0.75rem;
-
     padding-right: 0.5rem;
 }
 
-
-/* Place */
-
 .place-item {
     background-color: white;
-
     padding: 1rem;
-
     border-radius: 0.5rem;
-
     border: 1px solid var(--border-color);
-
     display: flex;
-
     align-items: center;
-
     gap: 0.75rem;
-
     cursor: grab;
-
     transition: all 0.2s;
-
     position: relative;
-
-    flex-shrink: 0;
 }
 
 .place-item.dragging {
     opacity: 0.5;
-
     border: 2px dashed var(--primary-color);
 }
 
 .place-item.locked {
     background-color: #f1f5f9;
-
     border-color: #cbd5e1;
-
     cursor: default;
 }
 
 .place-number {
     width: 24px;
     height: 24px;
-
     background-color: var(--primary-color);
-
     color: white;
-
     border-radius: 50%;
-
     display: flex;
-
     align-items: center;
     justify-content: center;
-
     font-size: 0.75rem;
-
     font-weight: 700;
-
     flex-shrink: 0;
 }
 
 .place-name {
     flex: 1;
-
-    min-width: 0;
-
     font-weight: 500;
-
     font-size: 0.95rem;
-
-    overflow: hidden;
-
-    text-overflow: ellipsis;
-
-    white-space: nowrap;
 }
 
 .lock-btn,
 .remove-place-btn {
     background: none;
-
     border: none;
-
     color: #94a3b8;
-
     cursor: pointer;
-
     padding: 0.25rem;
-
     transition: color 0.2s;
-
-    flex-shrink: 0;
 }
 
 .lock-btn:hover {
@@ -1323,6 +793,7 @@ a {
 
 .lock-btn.active {
     color: #f59e0b;
+    /* Amber for locked */
 }
 
 .remove-place-btn:hover {
@@ -1331,100 +802,60 @@ a {
 
 .optimize-btn {
     margin-top: 1rem;
-
     width: 100%;
-
     justify-content: center;
-
-    flex-shrink: 0;
 }
 
-
-/* =========================================================
-   MAP
-   ========================================================= */
-
+/* Map */
 .map-container {
     flex: 1;
-
-    min-width: 0;
-
     position: relative;
 }
 
 #map {
     width: 100%;
-
     height: 100%;
 }
 
-
-/* =========================================================
-   ADD TRIP PAGE
-   ========================================================= */
-
+/* Add Trip Page Redesign */
 .add-page-container {
     min-height: 100vh;
-
-    width: 100%;
-
     display: flex;
-
     flex-direction: column;
-
     align-items: center;
-
     justify-content: center;
-
     background-color: var(--bg-color);
-
     padding: 2rem;
-
-    overflow-y: auto;
 }
 
 .add-page-header {
     text-align: center;
-
     margin-bottom: 2rem;
-
     width: 100%;
-
     max-width: 600px;
-
     position: relative;
 }
 
 .add-page-header h1 {
     font-size: 1.75rem;
-
     color: var(--text-main);
-
     margin-top: 1rem;
 }
 
 .add-page-header .back-link {
     position: absolute;
-
     left: 0;
     top: 0;
-
     margin: 0;
 }
 
 .add-form-container {
     width: 100%;
-
     max-width: 500px;
-
     background-color: white;
-
     padding: 2.5rem;
-
     border-radius: 1rem;
-
     box-shadow: var(--shadow-lg);
-
     border: 1px solid var(--border-color);
 }
 
@@ -1434,539 +865,46 @@ a {
 
 .add-trip-form label {
     display: block;
-
     font-weight: 600;
-
     margin-bottom: 0.5rem;
-
     color: var(--text-main);
 }
 
 .add-trip-form input[type="text"],
 .add-trip-form input[type="date"] {
     width: 100%;
-
     padding: 0.875rem;
-
     border: 1px solid var(--border-color);
-
     border-radius: 0.5rem;
-
     font-size: 1rem;
-
-    background-color: white;
-
     transition: all 0.2s;
 }
 
 .add-trip-form input:focus {
     border-color: var(--primary-color);
-
-    box-shadow:
-        0 0 0 3px rgba(37, 99, 235, 0.1);
-
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
     outline: none;
 }
 
 .date-range-group {
     display: flex;
-
     align-items: flex-end;
-
     gap: 1rem;
 }
 
 .date-input {
     flex: 1;
-
-    min-width: 0;
 }
 
 .date-separator {
     padding-bottom: 0.8rem;
-
     color: var(--text-muted);
-
     font-weight: 600;
 }
 
 #add-btn {
     width: 100%;
-
     margin-top: 1rem;
-
     padding: 1rem;
-
     font-size: 1.1rem;
-}
-
-
-/* =========================================================
-   MOBILE LOGO / WELCOME
-   ========================================================= */
-
-.mobile-logo,
-.mobile-welcome {
-    display: none;
-}
-
-
-/* =========================================================
-   MOBILE
-   ========================================================= */
-
-@media (max-width: 768px) {
-
-    /* -----------------------------------------------------
-       BODY
-       ----------------------------------------------------- */
-
-    body {
-        height: auto;
-
-        min-height: 100vh;
-
-        overflow-x: hidden;
-
-        overflow-y: auto;
-    }
-
-
-    /* -----------------------------------------------------
-       MAIN PAGE
-       ----------------------------------------------------- */
-
-    .app-container {
-        flex-direction: column;
-
-        width: 100%;
-
-        height: auto;
-
-        min-height: 100vh;
-    }
-
-
-    /* -----------------------------------------------------
-       SIDEBAR
-       ----------------------------------------------------- */
-
-    .sidebar {
-        width: 100%;
-
-        height: auto;
-
-        min-height: 0;
-
-        border-right: none;
-
-        border-bottom: 1px solid var(--border-color);
-
-        padding: 1rem;
-
-        flex-shrink: 0;
-    }
-
-
-    /* PC logo hide */
-
-    .sidebar .logo-area {
-        display: none;
-    }
-
-
-    /* Mobile logo */
-
-    .mobile-logo {
-        display: flex;
-
-        align-items: center;
-
-        gap: 10px;
-
-        font-size: 1.2rem;
-
-        font-weight: 700;
-
-        color: var(--text-main);
-
-        margin-bottom: 1rem;
-    }
-
-    .mobile-logo i {
-        color: var(--primary-color);
-
-        font-size: 1.4rem;
-    }
-
-    .mobile-logo > span > span {
-        color: var(--primary-color);
-    }
-
-
-    /* Sidebar places */
-
-    .places-section {
-        overflow: visible;
-
-        min-height: 0;
-    }
-
-    .sidebar-actions {
-        margin-top: 1rem;
-    }
-
-    .trip-stats {
-        margin-top: 1rem;
-
-        padding-top: 1rem;
-    }
-
-
-    /* -----------------------------------------------------
-       MAIN CONTENT
-       ----------------------------------------------------- */
-
-    .main-content {
-        width: 100%;
-
-        height: auto;
-
-        min-height: 0;
-
-        display: flex;
-
-        flex-direction: column;
-
-        overflow: visible;
-    }
-
-
-    /* -----------------------------------------------------
-       TOP BAR
-       ----------------------------------------------------- */
-
-    .top-bar {
-        width: 100%;
-
-        height: auto;
-
-        min-height: 70px;
-
-        padding: 1rem;
-
-        flex-shrink: 0;
-    }
-
-
-    /* PC welcome hide */
-
-    .main-content > .top-bar .user-welcome {
-        display: none;
-    }
-
-
-    /* Actions */
-
-    .actions {
-        gap: 0.25rem;
-    }
-
-
-    /* -----------------------------------------------------
-       CONTENT
-       ----------------------------------------------------- */
-
-    .content-area {
-        width: 100%;
-
-        padding: 1rem;
-
-        overflow: visible;
-    }
-
-
-    /* Mobile welcome */
-
-    .mobile-welcome {
-        display: block;
-
-        margin-bottom: 1.5rem;
-    }
-
-    .mobile-welcome h2 {
-        font-size: 1.6rem;
-
-        font-weight: 700;
-
-        margin-bottom: 0.4rem;
-
-        color: var(--text-main);
-    }
-
-    .mobile-welcome p {
-        font-size: 1rem;
-
-        color: var(--text-main);
-
-        margin: 0;
-    }
-
-
-    /* -----------------------------------------------------
-       SECTION HEADER
-       ----------------------------------------------------- */
-
-    .section-header {
-        align-items: flex-start;
-
-        gap: 1rem;
-
-        flex-wrap: wrap;
-    }
-
-    .tab-container {
-        gap: 0.75rem;
-    }
-
-    .tab-btn {
-        font-size: 0.9rem;
-    }
-
-    .view-options {
-        margin-left: auto;
-    }
-
-
-    /* -----------------------------------------------------
-       TRIP CARD
-       ----------------------------------------------------- */
-
-    .trip-card {
-        padding: 1rem;
-    }
-
-    .trip-info {
-        flex-direction: column;
-
-        align-items: flex-start;
-
-        gap: 0.35rem;
-    }
-
-    .trip-info h3 {
-        font-size: 1rem;
-    }
-
-    .trip-info p {
-        font-size: 0.8rem;
-    }
-
-
-    /* -----------------------------------------------------
-       CALENDAR
-       ----------------------------------------------------- */
-
-    .calendar-view-container {
-        height: auto;
-
-        min-height: 500px;
-
-        padding: 0.75rem;
-
-        overflow-x: auto;
-    }
-
-    .calendar-grid {
-        min-width: 600px;
-    }
-
-    .calendar-day {
-        min-height: 60px;
-
-        padding: 0.25rem;
-
-        font-size: 0.75rem;
-    }
-
-    .trip-label {
-        font-size: 0.6rem;
-
-        padding: 2px 3px;
-    }
-
-
-    /* -----------------------------------------------------
-       NOTIFICATION
-       ----------------------------------------------------- */
-
-    .notification-dropdown {
-        position: fixed;
-
-        top: 70px;
-
-        right: 1rem;
-
-        left: 1rem;
-
-        width: auto;
-
-        max-width: none;
-    }
-
-
-    /* -----------------------------------------------------
-       PROFILE
-       ----------------------------------------------------- */
-
-    .profile-dropdown {
-        right: 0;
-
-        width: 200px;
-    }
-
-
-    /* =====================================================
-       DETAIL PAGE
-       ===================================================== */
-
-    .detail-page-container {
-        flex-direction: column;
-
-        width: 100%;
-
-        height: auto;
-
-        min-height: 100vh;
-
-        overflow: visible;
-    }
-
-
-    /* Detail sidebar */
-
-    .detail-sidebar {
-        width: 100%;
-
-        height: auto;
-
-        min-height: 0;
-
-        border-right: none;
-
-        border-bottom: 1px solid var(--border-color);
-
-        box-shadow: none;
-    }
-
-
-    /* Detail header */
-
-    .detail-header {
-        padding: 1rem;
-    }
-
-
-    /* Detail places */
-
-    .detail-sidebar .places-section {
-        padding: 1rem;
-
-        max-height: none;
-
-        min-height: 0;
-
-        overflow: visible;
-    }
-
-    .places-list {
-        max-height: 350px;
-
-        overflow-y: auto;
-    }
-
-
-    /* Map */
-
-    .map-container {
-        width: 100%;
-
-        height: 450px;
-
-        min-height: 450px;
-
-        flex-shrink: 0;
-    }
-
-    #map {
-        width: 100%;
-
-        height: 100%;
-    }
-
-
-    /* =====================================================
-       ADD TRIP PAGE
-       ===================================================== */
-
-    .add-page-container {
-        width: 100%;
-
-        min-height: 100vh;
-
-        padding: 1rem;
-
-        justify-content: flex-start;
-
-        padding-top: 2rem;
-
-        overflow-y: auto;
-    }
-
-    .add-page-header {
-        margin-bottom: 1.5rem;
-    }
-
-    .add-page-header h1 {
-        font-size: 1.4rem;
-    }
-
-    .add-page-header .back-link {
-        position: static;
-
-        display: flex;
-
-        margin-bottom: 1rem;
-    }
-
-    .add-form-container {
-        padding: 1.5rem;
-
-        border-radius: 0.75rem;
-    }
-
-    .date-range-group {
-        gap: 0.5rem;
-    }
-
-    .date-separator {
-        padding-bottom: 0.75rem;
-    }
-}
-
-
-/* =========================================================
-   PC ONLY
-   ========================================================= */
-
-@media (min-width: 769px) {
-
-    .mobile-logo,
-    .mobile-welcome {
-        display: none;
-    }
-
-    .user-welcome {
-        display: block !important;
-    }
 }
