@@ -913,6 +913,9 @@ body {
 @media (max-width: 768px) {
 
     body {
+        .main-content {
+            display: contents;
+        }
         height: auto;
         min-height: 100vh;
         overflow: auto;
@@ -929,12 +932,8 @@ body {
     }
 
     .sidebar {
-        width: 100%;
-        height: auto;
-        border-right: none;
-        border-bottom: 1px solid var(--border-color);
-        padding: 1rem;
-    }
+    position: relative;
+}
 
     .logo-area {
         margin-bottom: 1rem;
