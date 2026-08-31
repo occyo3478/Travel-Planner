@@ -1180,3 +1180,42 @@ body {
         display: none;
     }
 }
+
+/* 모바일 전용 */
+.mobile-logo,
+.mobile-welcome {
+    display: none;
+}
+
+@media (max-width: 768px) {
+
+    /* PC 레이아웃에는 영향 없음 */
+    .sidebar .logo-area {
+        display: none;
+    }
+
+    .mobile-logo {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 1.2rem;
+        font-weight: 700;
+    }
+
+    .mobile-logo i {
+        color: var(--primary-color);
+        font-size: 1.4rem;
+    }
+
+    .mobile-logo > span > span {
+        color: var(--primary-color);
+    }
+
+    .mobile-welcome {
+        display: block;
+    }
+
+    .main-content > .top-bar .user-welcome {
+        display: none;
+    }
+}
