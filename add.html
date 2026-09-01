@@ -12,8 +12,7 @@
 
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
-        rel="stylesheet"
-    >
+        rel="stylesheet">
 
     <link rel="stylesheet" href="style.css">
 
@@ -34,7 +33,148 @@
                 돌아가기
             </a>
 
-            <h1>
+            <h1>새로운 여행 계획하기</h1>
+
+        </header>
+
+
+        <main class="add-form-container">
+
+            <div class="add-trip-form">
+
+                <div class="input-group">
+
+                    <label for="destination">
+                        여행지
+                    </label>
+
+                    <input
+                        type="text"
+                        id="destination"
+                        placeholder="예: 파리, 제주도"
+                    >
+
+                </div>
+
+
+                <div class="input-group date-range-group">
+
+                    <div class="date-input">
+
+                        <label for="start-date">
+                            시작일
+                        </label>
+
+                        <input
+                            type="date"
+                            id="start-date"
+                        >
+
+                    </div>
+
+
+                    <span class="date-separator">
+                        ~
+                    </span>
+
+
+                    <div class="date-input">
+
+                        <label for="end-date">
+                            종료일
+                        </label>
+
+                        <input
+                            type="date"
+                            id="end-date"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="input-group">
+
+                    <label for="activity">
+                        주요 활동
+                    </label>
+
+                    <input
+                        type="text"
+                        id="activity"
+                        placeholder="예: 에펠탑 방문, 맛집 투어"
+                    >
+
+                </div>
+
+
+                <button
+                    id="add-btn"
+                    class="btn-primary"
+                    type="button"
+                >
+
+                    <i class="fa-solid fa-plus"></i>
+                    일정 추가하기
+
+                </button>
+
+            </div>
+
+        </main>
+
+    </div>
+
+
+    <!-- Firebase -->
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+
+    <script>
+
+        const firebaseConfig = {
+
+            apiKey: "AIzaSyDqAZiiw7SKc4SLSsWug1G3e_f5-u-pkYw",
+
+            authDomain:
+                "travel-planner-a9d51.firebaseapp.com",
+
+            projectId:
+                "travel-planner-a9d51",
+
+            storageBucket:
+                "travel-planner-a9d51.firebasestorage.app",
+
+            messagingSenderId:
+                "966221614343",
+
+            appId:
+                "1:966221614343:web:f48783ed75140a8be589a2",
+
+            measurementId:
+                "G-6RSREEXYS4"
+
+        };
+
+
+        firebase.initializeApp(firebaseConfig);
+
+        window.db = firebase.firestore();
+
+    </script>
+
+
+    <!-- 내 JS -->
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>            <h1>
                 새로운 여행 계획하기
             </h1>
 
