@@ -1129,9 +1129,6 @@ select {
         color: var(--text-main);
     }
 
-    /* -------------------------
-       일정 헤더
-       ------------------------- */
 
     .section-header {
         align-items: flex-start;
@@ -1219,9 +1216,6 @@ select {
         z-index: 10000;
     }
 
-    /* -------------------------
-       상세 페이지
-       ------------------------- */
 
     .detail-page-container {
         flex-direction: column;
@@ -1261,10 +1255,6 @@ select {
         height: 450px;
         min-height: 450px;
     }
-
-    /* -------------------------
-       일정 추가 페이지
-       ------------------------- */
 
     .add-page-container {
         width: 100%;
