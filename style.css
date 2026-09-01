@@ -7269,11 +7269,6 @@ select {
     height: 100%;
 }
 
-
-/* =========================
-   Add Trip
-========================= */
-
 .add-page-container {
     min-height: 100vh;
     display: flex;
@@ -7370,11 +7365,6 @@ select {
 .mobile-welcome {
     display: none;
 }
-
-
-/* =========================
-   Mobile
-========================= */
 
 @media (max-width: 768px) {
 
@@ -7646,11 +7636,6 @@ select {
     }
 }
 
-
-/* =========================
-   Desktop
-========================= */
-
 @media (min-width: 769px) {
 
     .user-welcome {
@@ -7662,4 +7647,3 @@ select {
         display: none !important;
     }
 }
-```
