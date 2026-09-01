@@ -1,25 +1,21 @@
-if (window.__travelPlannerScriptLoaded) {
-    console.log('script.js 중복 실행 방지');
-} else {
-
-    window.__travelPlannerScriptLoaded = true;
-
-    document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
 
     // =========================================================
     // Firebase 설정
     // =========================================================
 
-    // 이미 HTML의 다른 JS에서 firebase/db를 만들고 있다면
-    // 아래 Firebase 초기화 부분은 넣지 않아도 됩니다.
-    //
-    // 반드시 window.db가 존재해야 합니다.
+    // index.html에서 Firebase가 초기화되고
+    // window.db에 Firestore 인스턴스가 저장되어 있어야 합니다.
 
-    if (typeof db === 'undefined') {
-        console.error('Firebase db가 없습니다.');
+    const db = window.db;
+
+    if (!db) {
+        console.error('Firebase Firestore 연결 실패:', window.db);
         alert('Firebase 연결을 확인해주세요.');
         return;
     }
+
+    console.log('Firebase Firestore 연결 성공');
 
 
     // =========================================================
@@ -68,7 +64,6 @@ if (window.__travelPlannerScriptLoaded) {
     else if (isIndexPage) {
         initIndexPage();
     }
-
 
 
     // =========================================================
@@ -143,7 +138,6 @@ if (window.__travelPlannerScriptLoaded) {
     }
 
 
-
     // =========================================================
     // 여행 하나 저장
     // =========================================================
@@ -211,7 +205,6 @@ if (window.__travelPlannerScriptLoaded) {
         }
 
     }
-
 
 
     // =========================================================
@@ -477,7 +470,6 @@ if (window.__travelPlannerScriptLoaded) {
         }
 
 
-
         // =====================================================
         // 여행 카드
         // =====================================================
@@ -595,7 +587,6 @@ if (window.__travelPlannerScriptLoaded) {
                 `;
 
 
-                // 삭제 버튼
                 const deleteBtn =
                     card.querySelector(
                         '.delete-trip-btn'
@@ -616,7 +607,6 @@ if (window.__travelPlannerScriptLoaded) {
                 );
 
 
-                // 카드 클릭
                 card.addEventListener(
                     'click',
                     () => {
@@ -633,7 +623,6 @@ if (window.__travelPlannerScriptLoaded) {
             });
 
         }
-
 
 
         // =====================================================
@@ -688,7 +677,6 @@ if (window.__travelPlannerScriptLoaded) {
         }
 
 
-
         // =====================================================
         // 통계
         // =====================================================
@@ -728,7 +716,6 @@ if (window.__travelPlannerScriptLoaded) {
                     past;
 
         }
-
 
 
         // =====================================================
@@ -916,7 +903,6 @@ if (window.__travelPlannerScriptLoaded) {
     }
 
 
-
     // =========================================================
     // ADD PAGE
     // =========================================================
@@ -1043,9 +1029,8 @@ if (window.__travelPlannerScriptLoaded) {
     }
 
 
-
     // =========================================================
-    // ★ DETAIL PAGE
+    // DETAIL PAGE
     // =========================================================
 
     async function initDetailPage() {
@@ -1113,10 +1098,6 @@ if (window.__travelPlannerScriptLoaded) {
         // -----------------------------------------
         // Firestore 직접 조회
         // -----------------------------------------
-        //
-        // ★ 여기서 전체 trips를 불러오는 것보다
-        // 해당 문서 하나만 가져오는 게 훨씬 안전함.
-        //
 
         try {
 
@@ -1205,7 +1186,6 @@ if (window.__travelPlannerScriptLoaded) {
         }
 
 
-
         // -----------------------------------------
         // HTML 요소
         // -----------------------------------------
@@ -1266,9 +1246,8 @@ if (window.__travelPlannerScriptLoaded) {
         }
 
 
-
         // =====================================================
-        // ★★★ MAP 초기화 ★★★
+        // MAP 초기화
         // =====================================================
 
         console.log(
@@ -1291,7 +1270,6 @@ if (window.__travelPlannerScriptLoaded) {
         }
 
 
-        // 지도 높이 확인
         console.log(
             '지도 크기:',
             mapElement.offsetWidth,
@@ -1326,7 +1304,6 @@ if (window.__travelPlannerScriptLoaded) {
         );
 
 
-        // 지도 크기 재계산
         setTimeout(
             () => {
 
@@ -1335,7 +1312,6 @@ if (window.__travelPlannerScriptLoaded) {
             },
             300
         );
-
 
 
         // =====================================================
@@ -1353,7 +1329,6 @@ if (window.__travelPlannerScriptLoaded) {
             placesList.innerHTML = '';
 
 
-            // 마커/선 제거
             map.eachLayer(
                 layer => {
 
@@ -1397,10 +1372,6 @@ if (window.__travelPlannerScriptLoaded) {
 
             currentTrip.places.forEach(
                 (place, index) => {
-
-                    // -------------------------------
-                    // 목록
-                    // -------------------------------
 
                     const item =
                         document.createElement(
@@ -1458,7 +1429,6 @@ if (window.__travelPlannerScriptLoaded) {
                     `;
 
 
-                    // 잠금
                     const lockBtn =
                         item.querySelector(
                             '.lock-btn'
@@ -1482,7 +1452,6 @@ if (window.__travelPlannerScriptLoaded) {
                     );
 
 
-                    // 삭제
                     const removeBtn =
                         item.querySelector(
                             '.remove-place-btn'
@@ -1520,7 +1489,6 @@ if (window.__travelPlannerScriptLoaded) {
                     );
 
 
-                    // 드래그
                     if (!place.isLocked) {
 
                         item.addEventListener(
@@ -1554,10 +1522,6 @@ if (window.__travelPlannerScriptLoaded) {
                     placesList.appendChild(item);
 
 
-                    // -------------------------------
-                    // 지도 마커
-                    // -------------------------------
-
                     const lat =
                         Number(place.lat);
 
@@ -1588,10 +1552,6 @@ if (window.__travelPlannerScriptLoaded) {
                 }
             );
 
-
-            // -------------------------------
-            // 경로
-            // -------------------------------
 
             if (
                 latlngs.length > 1
@@ -1624,7 +1584,6 @@ if (window.__travelPlannerScriptLoaded) {
         }
 
 
-
         // =====================================================
         // 현재 여행 저장
         // =====================================================
@@ -1636,7 +1595,6 @@ if (window.__travelPlannerScriptLoaded) {
             );
 
         }
-
 
 
         // =====================================================
@@ -1759,7 +1717,6 @@ if (window.__travelPlannerScriptLoaded) {
 
                 if (!success) {
 
-                    // 저장 실패하면 되돌림
                     currentTrip.places.pop();
 
                     return;
@@ -1825,7 +1782,6 @@ if (window.__travelPlannerScriptLoaded) {
             );
 
         }
-
 
 
         // =====================================================
@@ -1931,7 +1887,6 @@ if (window.__travelPlannerScriptLoaded) {
         }
 
 
-
         async function updateOrder() {
 
             const items =
@@ -1989,7 +1944,6 @@ if (window.__travelPlannerScriptLoaded) {
         }
 
 
-
         // =====================================================
         // 경로 최적화
         // =====================================================
@@ -2043,7 +1997,6 @@ if (window.__travelPlannerScriptLoaded) {
             }
 
 
-            // 가장 단순하고 안정적인 최근접 이웃 방식
             const locked =
                 places.filter(
                     p => p.isLocked
@@ -2057,7 +2010,6 @@ if (window.__travelPlannerScriptLoaded) {
             const result = [];
 
 
-            // 첫 번째 장소
             let current =
                 unlockedCopy.shift();
 
@@ -2070,6 +2022,7 @@ if (window.__travelPlannerScriptLoaded) {
             ) {
 
                 let nearestIndex = 0;
+
                 let nearestDistance =
                     Infinity;
 
@@ -2117,7 +2070,6 @@ if (window.__travelPlannerScriptLoaded) {
             }
 
 
-            // 잠긴 장소는 기존 위치 유지
             const finalRoute =
                 new Array(
                     places.length
@@ -2173,7 +2125,6 @@ if (window.__travelPlannerScriptLoaded) {
             );
 
         }
-
 
 
         function calculateDistance(
@@ -2244,9 +2195,8 @@ if (window.__travelPlannerScriptLoaded) {
         }
 
 
-
         // =====================================================
-        // ★ 마지막으로 장소 렌더링
+        // 마지막으로 장소 렌더링
         // =====================================================
 
         renderPlaces();
@@ -2257,7 +2207,6 @@ if (window.__travelPlannerScriptLoaded) {
         );
 
     }
-
 
 
     // =========================================================
