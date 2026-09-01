@@ -9,7 +9,6 @@
 ```
 <title>일정 추가 - Travel Planner</title>
 
-<!-- Google Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
@@ -18,10 +17,8 @@
     rel="stylesheet"
 >
 
-<!-- CSS -->
 <link rel="stylesheet" href="style.css">
 
-<!-- Font Awesome -->
 <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
@@ -35,10 +32,6 @@
 ```
 <div class="add-page-container">
 
-    <!-- =========================
-         상단
-    ========================== -->
-
     <header class="add-page-header">
 
         <a href="index.html" class="back-link">
@@ -46,105 +39,65 @@
             돌아가기
         </a>
 
-        <h1>
-            새로운 여행 계획하기
-        </h1>
+        <h1>새로운 여행 계획하기</h1>
 
     </header>
-
-
-    <!-- =========================
-         일정 추가 폼
-    ========================== -->
 
     <main class="add-form-container">
 
         <div class="add-trip-form">
 
-            <!-- 여행지 -->
-
             <div class="input-group">
-
-                <label for="destination">
-                    여행지
-                </label>
+                <label for="destination">여행지</label>
 
                 <input
                     type="text"
                     id="destination"
                     placeholder="예: 파리, 제주도"
                 >
-
             </div>
-
-
-            <!-- 날짜 -->
 
             <div class="input-group date-range-group">
 
                 <div class="date-input">
-
-                    <label for="start-date">
-                        시작일
-                    </label>
+                    <label for="start-date">시작일</label>
 
                     <input
                         type="date"
                         id="start-date"
                     >
-
                 </div>
 
-
-                <span class="date-separator">
-                    ~
-                </span>
-
+                <span class="date-separator">~</span>
 
                 <div class="date-input">
-
-                    <label for="end-date">
-                        종료일
-                    </label>
+                    <label for="end-date">종료일</label>
 
                     <input
                         type="date"
                         id="end-date"
                     >
-
                 </div>
 
             </div>
 
-
-            <!-- 주요 활동 -->
-
             <div class="input-group">
-
-                <label for="activity">
-                    주요 활동
-                </label>
+                <label for="activity">주요 활동</label>
 
                 <input
                     type="text"
                     id="activity"
                     placeholder="예: 에펠탑 방문, 맛집 투어"
                 >
-
             </div>
-
-
-            <!-- 추가 버튼 -->
 
             <button
                 id="add-btn"
                 class="btn-primary"
                 type="button"
             >
-
                 <i class="fa-solid fa-plus"></i>
                 일정 추가하기
-
             </button>
 
         </div>
@@ -153,524 +106,10 @@
 
 </div>
 
-
-<!-- =========================
-     Firebase
-========================== -->
-
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
-
 <script>
-
-    const firebaseConfig = {
-
-        apiKey:
-            "AIzaSyDqAZiiw7SKc4SLSsWug1G3e_f5-u-pkYw",
-
-        authDomain:
-            "travel-planner-a9d51.firebaseapp.com",
-
-        projectId:
-            "travel-planner-a9d51",
-
-        storageBucket:
-            "travel-planner-a9d51.firebasestorage.app",
-
-        messagingSenderId:
-            "966221614343",
-
-        appId:
-            "1:966221614343:web:f48783ed75140a8be589a2",
-
-        measurementId:
-            "G-6RSREEXYS4"
-
-    };
-
-
-    firebase.initializeApp(firebaseConfig);
-
-    window.db =
-        firebase.firestore();
-
-</script>
-
-
-<!-- =========================
-     내 JS
-========================== -->
-
-<script src="script.js"></script>
-```
-
-</body>
-
-</html>
-
-        </header>
-
-
-        <main class="add-form-container">
-
-            <div class="add-trip-form">
-
-                <div class="input-group">
-
-                    <label for="destination">
-                        여행지
-                    </label>
-
-                    <input
-                        type="text"
-                        id="destination"
-                        placeholder="예: 파리, 제주도"
-                    >
-
-                </div>
-
-
-                <div class="input-group date-range-group">
-
-                    <div class="date-input">
-
-                        <label for="start-date">
-                            시작일
-                        </label>
-
-                        <input
-                            type="date"
-                            id="start-date"
-                        >
-
-                    </div>
-
-
-                    <span class="date-separator">
-                        ~
-                    </span>
-
-
-                    <div class="date-input">
-
-                        <label for="end-date">
-                            종료일
-                        </label>
-
-                        <input
-                            type="date"
-                            id="end-date"
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <div class="input-group">
-
-                    <label for="activity">
-                        주요 활동
-                    </label>
-
-                    <input
-                        type="text"
-                        id="activity"
-                        placeholder="예: 에펠탑 방문, 맛집 투어"
-                    >
-
-                </div>
-
-
-                <button
-                    id="add-btn"
-                    class="btn-primary"
-                    type="button"
-                >
-
-                    <i class="fa-solid fa-plus"></i>
-                    일정 추가하기
-
-                </button>
-
-            </div>
-
-        </main>
-
-    </div>
-
-
-    <!-- Firebase -->
-
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-
-
-    <script>
-
-        const firebaseConfig = {
-
-            apiKey: "AIzaSyDqAZiiw7SKc4SLSsWug1G3e_f5-u-pkYw",
-
-            authDomain:
-                "travel-planner-a9d51.firebaseapp.com",
-
-            projectId:
-                "travel-planner-a9d51",
-
-            storageBucket:
-                "travel-planner-a9d51.firebasestorage.app",
-
-            messagingSenderId:
-                "966221614343",
-
-            appId:
-                "1:966221614343:web:f48783ed75140a8be589a2",
-
-            measurementId:
-                "G-6RSREEXYS4"
-
-        };
-
-
-        firebase.initializeApp(firebaseConfig);
-
-        window.db = firebase.firestore();
-
-    </script>
-
-
-    <!-- 내 JS -->
-
-    <script src="script.js"></script>
-
-</body>
-
-</html>            <h1>
-                새로운 여행 계획하기
-            </h1>
-
-        </header>
-
-
-        <main class="add-form-container">
-
-            <div class="add-trip-form">
-
-                <div class="input-group">
-
-                    <label for="destination">
-                        여행지
-                    </label>
-
-                    <input
-                        type="text"
-                        id="destination"
-                        placeholder="예: 파리, 제주도"
-                    >
-
-                </div>
-
-
-                <div class="input-group date-range-group">
-
-                    <div class="date-input">
-
-                        <label for="start-date">
-                            시작일
-                        </label>
-
-                        <input
-                            type="date"
-                            id="start-date"
-                        >
-
-                    </div>
-
-
-                    <span class="date-separator">
-                        ~
-                    </span>
-
-
-                    <div class="date-input">
-
-                        <label for="end-date">
-                            종료일
-                        </label>
-
-                        <input
-                            type="date"
-                            id="end-date"
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <div class="input-group">
-
-                    <label for="activity">
-                        주요 활동
-                    </label>
-
-                    <input
-                        type="text"
-                        id="activity"
-                        placeholder="예: 에펠탑 방문, 맛집 투어"
-                    >
-
-                </div>
-
-
-                <button
-                    id="add-btn"
-                    class="btn-primary"
-                    type="button"
-                >
-                    <i class="fa-solid fa-plus"></i>
-                    일정 추가하기
-                </button>
-
-            </div>
-
-        </main>
-
-    </div>
-
-
-    <!-- Firebase -->
-
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-
-
-    <script>
-
-        const firebaseConfig = {
-
-            apiKey: "AIzaSyDqAZiiw7SKc4SLSsWug1G3e_f5-u-pkYw",
-
-            authDomain:
-                "travel-planner-a9d51.firebaseapp.com",
-
-            projectId:
-                "travel-planner-a9d51",
-
-            storageBucket:
-                "travel-planner-a9d51.firebasestorage.app",
-
-            messagingSenderId:
-                "966221614343",
-
-            appId:
-                "1:966221614343:web:f48783ed75140a8be589a2",
-
-            measurementId:
-                "G-6RSREEXYS4"
-
-        };
-
-
-        firebase.initializeApp(
-            firebaseConfig
-        );
-
-        window.db =
-            firebase.firestore();
-
-    </script>
-
-
-    <!-- 내 JS -->
-
-    <script src="script.js"></script>
-
-</body>
-
-</html>                <i class="fa-solid fa-arrow-left"></i>
-                돌아가기
-            </a>
-
-            <h1>
-                새로운 여행 계획하기
-            </h1>
-
-        </header>
-
-
-        <main class="add-form-container">
-
-            <div class="add-trip-form">
-
-
-                <!-- 여행지 -->
-
-                <div class="input-group">
-
-                    <label for="destination">
-                        여행지
-                    </label>
-
-                    <input
-                        type="text"
-                        id="destination"
-                        placeholder="예: 파리, 제주도"
-                    >
-
-                </div>
-
-
-                <!-- 날짜 -->
-
-                <div class="input-group date-range-group">
-
-                    <div class="date-input">
-
-                        <label for="start-date">
-                            시작일
-                        </label>
-
-                        <input
-                            type="date"
-                            id="start-date"
-                        >
-
-                    </div>
-
-
-                    <span class="date-separator">
-                        ~
-                    </span>
-
-
-                    <div class="date-input">
-
-                        <label for="end-date">
-                            종료일
-                        </label>
-
-                        <input
-                            type="date"
-                            id="end-date"
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <!-- 주요 활동 -->
-
-                <div class="input-group">
-
-                    <label for="activity">
-                        주요 활동
-                    </label>
-
-                    <input
-                        type="text"
-                        id="activity"
-                        placeholder="예: 에펠탑 방문, 맛집 투어"
-                    >
-
-                </div>
-
-
-                <!-- 추가 버튼 -->
-
-                <button
-                    id="add-btn"
-                    class="btn-primary"
-                    type="button"
-                >
-
-                    <i class="fa-solid fa-plus"></i>
-
-                    일정 추가하기
-
-                </button>
-
-
-            </div>
-
-        </main>
-
-    </div>
-
-
-
-    <!-- =========================
-         Firebase
-    ========================== -->
-
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-
-
-    <script>
-
-        const firebaseConfig = {
-
-            apiKey: "AIzaSyDqAZiiw7SKc4SLSsWug1G3e_f5-u-pkYw",
-
-            authDomain: "travel-planner-a9d51.firebaseapp.com",
-
-            projectId: "travel-planner-a9d51",
-
-            storageBucket: "travel-planner-a9d51.firebasestorage.app",
-
-            messagingSenderId: "966221614343",
-
-            appId: "1:966221614343:web:f48783ed75140a8be589a2",
-
-            measurementId: "G-6RSREEXYS4"
-
-        };
-
-
-        firebase.initializeApp(firebaseConfig);
-
-        window.db =
-            firebase.firestore();
-
-    </script>
-
-
-    <!-- =========================
-         내 JS
-    ========================== -->
-
-    <script src="script.js"></script>
-
-</body>
-
-</html>                        <label for="end-date">종료일</label>
-                        <input type="date" id="end-date">
-                    </div>
-                </div>
-                <div class="input-group">
-                    <label for="activity">주요 활동</label>
-                    <input type="text" id="activity" placeholder="예: 에펠탑 방문, 맛집 투어">
-                </div>
-                <button id="add-btn" class="btn-primary">
-                    <i class="fa-solid fa-plus"></i> 일정 추가하기
-                </button>
-            </div>
-        </main>
-    </div>
-
-    <!-- Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-
-    <script>
     const firebaseConfig = {
         apiKey: "AIzaSyDqAZiiw7SKc4SLSsWug1G3e_f5-u-pkYw",
         authDomain: "travel-planner-a9d51.firebaseapp.com",
@@ -685,46 +124,9 @@
     window.db = firebase.firestore();
 </script>
 
-    <!-- 내 JS -->
-    <script src="script.js"></script>
-</body>
-
-</html>                        <label for="end-date">종료일</label>
-                        <input type="date" id="end-date">
-                    </div>
-                </div>
-                <div class="input-group">
-                    <label for="activity">주요 활동</label>
-                    <input type="text" id="activity" placeholder="예: 에펠탑 방문, 맛집 투어">
-                </div>
-                <button id="add-btn" class="btn-primary">
-                    <i class="fa-solid fa-plus"></i> 일정 추가하기
-                </button>
-            </div>
-        </main>
-    </div>
-
-    <!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-
-<script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyDqAZiiw7SKc4SLSsWug1G3e_f5-u-pkYw",
-        authDomain: "travel-planner-a9d51.firebaseapp.com",
-        projectId: "travel-planner-a9d51",
-        storageBucket: "travel-planner-a9d51.firebasestorage.app",
-        messagingSenderId: "966221614343",
-        appId: "1:966221614343:web:f48783ed75140a8be589a2",
-        measurementId: "G-6RSREEXYS4"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-</script>
-
-<!-- 내 JS -->
 <script src="script.js"></script>
+```
+
 </body>
 
 </html>
