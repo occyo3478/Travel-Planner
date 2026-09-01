@@ -1,39 +1,534 @@
 <!DOCTYPE html>
+
 <html lang="ko">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Travel Planner</title>
+```
+<title>Travel Planner</title>
 
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
-        rel="stylesheet">
+<link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
+    rel="stylesheet"
+>
 
-    <!-- 내 CSS -->
-    <link rel="stylesheet" href="style.css">
+<!-- 내 CSS -->
+<link rel="stylesheet" href="style.css">
 
-    <!-- Font Awesome -->
-    <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    >
+<!-- Font Awesome -->
+<link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+>
 
-    <!-- Leaflet CSS -->
-    <link
-        rel="stylesheet"
-        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-        crossorigin=""
-    >
+<!-- Leaflet CSS -->
+<link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+>
+```
+
 </head>
 
+<body>
 
+```
+<div class="app-container">
+
+    <!-- =========================
+         Sidebar
+    ========================== -->
+
+    <aside class="sidebar">
+
+        <!-- PC용 로고 -->
+        <div class="logo-area">
+            <i class="fa-solid fa-plane-departure logo-icon"></i>
+
+            <h1>
+                Travel<span class="highlight">Planner</span>
+            </h1>
+        </div>
+
+
+        <!-- 모바일용 환영 문구 -->
+        <div class="mobile-welcome">
+            <h2>반갑습니다, 여행자님! 👋</h2>
+            <p>다음 여행을 계획해보세요.</p>
+        </div>
+
+
+        <!-- 검색 영역 -->
+        <div class="places-section">
+
+            <!-- 여행지 검색 -->
+            <div class="input-group period-search-group">
+
+                <label class="filter-label">
+                    여행지 검색
+                </label>
+
+                <input
+                    type="text"
+                    id="search-name"
+                    placeholder="여행지 이름 검색"
+                >
+
+            </div>
+
+
+            <!-- 기간 검색 -->
+            <div class="input-group period-search-group">
+
+                <label class="filter-label">
+                    기간 검색
+                </label>
+
+                <div class="date-filter-group">
+
+                    <div class="input-group">
+                        <select id="search-year">
+                            <option value="">년도 선택</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <select id="search-month">
+
+                            <option value="">월 선택</option>
+
+                            <option value="1">1월</option>
+                            <option value="2">2월</option>
+                            <option value="3">3월</option>
+                            <option value="4">4월</option>
+                            <option value="5">5월</option>
+                            <option value="6">6월</option>
+                            <option value="7">7월</option>
+                            <option value="8">8월</option>
+                            <option value="9">9월</option>
+                            <option value="10">10월</option>
+                            <option value="11">11월</option>
+                            <option value="12">12월</option>
+
+                        </select>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- 검색 버튼 -->
+            <button
+                id="search-btn"
+                class="btn-secondary"
+                type="button"
+            >
+                <i class="fa-solid fa-magnifying-glass"></i>
+                검색하기
+            </button>
+
+        </div>
+
+
+        <!-- 새로운 일정 -->
+        <div class="sidebar-actions">
+
+            <a
+                href="add.html"
+                class="btn-primary"
+            >
+                <i class="fa-solid fa-plus"></i>
+                새로운 일정 만들기
+            </a>
+
+        </div>
+
+
+        <!-- 여행 통계 -->
+        <div class="trip-stats">
+
+            <div class="stat-card">
+                <span
+                    class="stat-number"
+                    id="total-trips"
+                >
+                    0
+                </span>
+
+                <span class="stat-label">
+                    계획된 여행
+                </span>
+            </div>
+
+
+            <div class="stat-card">
+                <span
+                    class="stat-number"
+                    id="upcoming-trips"
+                >
+                    0
+                </span>
+
+                <span class="stat-label">
+                    다가오는 일정
+                </span>
+            </div>
+
+
+            <div class="stat-card">
+                <span
+                    class="stat-number"
+                    id="past-trips"
+                >
+                    0
+                </span>
+
+                <span class="stat-label">
+                    지난 여행
+                </span>
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =========================
+         Main
+    ========================== -->
+
+    <main class="main-content">
+
+        <!-- 상단바 -->
+        <header class="top-bar">
+
+            <!-- PC용 환영 문구 -->
+            <div class="user-welcome">
+
+                <h2>
+                    반갑습니다, 여행자님! 👋
+                </h2>
+
+                <p>
+                    다음 여행을 계획해보세요.
+                </p>
+
+            </div>
+
+
+            <!-- 모바일용 로고 -->
+            <div class="mobile-logo">
+
+                <i class="fa-solid fa-plane-departure"></i>
+
+                <span>
+                    Travel<span>Planner</span>
+                </span>
+
+            </div>
+
+
+            <!-- 오른쪽 아이콘 -->
+            <div class="actions">
+
+                <!-- 알림 -->
+                <div class="notification-container">
+
+                    <button
+                        class="btn-icon"
+                        id="notification-btn"
+                        type="button"
+                    >
+                        <i class="fa-regular fa-bell"></i>
+                    </button>
+
+
+                    <div
+                        class="notification-dropdown"
+                        id="notification-dropdown"
+                    >
+
+                        <div class="notification-header">
+                            알림
+                        </div>
+
+                        <ul
+                            class="notification-list"
+                            id="notification-list"
+                        >
+
+                            <li class="empty-noti">
+                                새로운 알림이 없습니다.
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+                </div>
+
+
+                <!-- 프로필 -->
+                <div
+                    class="user-profile"
+                    id="profile-btn"
+                >
+
+                    <img
+                        src="https://ui-avatars.com/api/?name=Traveler&background=0D8ABC&color=fff"
+                        alt="User"
+                    >
+
+
+                    <div
+                        class="profile-dropdown"
+                        id="profile-dropdown"
+                    >
+
+                        <div class="profile-header">
+
+                            <strong>
+                                Traveler
+                            </strong>
+
+                            <span>
+                                traveler@example.com
+                            </span>
+
+                        </div>
+
+
+                        <ul class="profile-menu">
+
+                            <li>
+                                <a href="#">
+                                    <i class="fa-regular fa-user"></i>
+                                    내 프로필
+                                </a>
+                            </li>
+
+
+                            <li>
+                                <a href="#">
+                                    <i class="fa-solid fa-gear"></i>
+                                    설정
+                                </a>
+                            </li>
+
+
+                            <li class="divider"></li>
+
+
+                            <li>
+                                <a
+                                    href="#"
+                                    class="text-danger"
+                                >
+                                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                                    로그아웃
+                                </a>
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- =========================
+             Content
+        ========================== -->
+
+        <section class="content-area">
+
+            <!-- 모바일 환영 문구 -->
+            <div class="mobile-content-welcome">
+                <h2>반갑습니다, 여행자님! 👋</h2>
+                <p>다음 여행을 계획해보세요.</p>
+            </div>
+
+
+            <!-- 일정 탭 -->
+            <div class="section-header">
+
+                <div class="tab-container">
+
+                    <button
+                        class="tab-btn active"
+                        data-tab="upcoming"
+                        type="button"
+                    >
+                        다가오는 일정
+                    </button>
+
+                    <button
+                        class="tab-btn"
+                        data-tab="past"
+                        type="button"
+                    >
+                        지난 여행
+                    </button>
+
+                </div>
+
+
+                <!-- 리스트 / 달력 버튼 -->
+                <div class="view-options-wrapper">
+
+                    <div class="view-options">
+
+                        <button
+                            class="view-btn active"
+                            title="리스트 보기"
+                            data-view="list"
+                            type="button"
+                        >
+                            <i class="fa-solid fa-list"></i>
+                        </button>
+
+                        <button
+                            class="view-btn"
+                            title="달력 보기"
+                            data-view="calendar"
+                            type="button"
+                        >
+                            <i class="fa-regular fa-calendar"></i>
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- 여행 목록 -->
+            <div
+                id="trip-list"
+                class="trip-list"
+            >
+
+                <div
+                    class="empty-state"
+                    id="empty-state"
+                >
+
+                    <i class="fa-solid fa-map-location-dot"></i>
+
+                    <p>
+                        아직 계획된 여행이 없습니다.<br>
+                        왼쪽에서 새로운 일정을 추가해보세요!
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- 달력 -->
+            <div
+                id="calendar-view"
+                class="calendar-view-container"
+                style="display: none;"
+            >
+
+                <div class="calendar-controls">
+
+                    <button
+                        id="prev-month"
+                        class="cal-nav-btn"
+                        type="button"
+                    >
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+
+                    <h3 id="current-month-display">
+                        2026년 9월
+                    </h3>
+
+                    <button
+                        id="next-month"
+                        class="cal-nav-btn"
+                        type="button"
+                    >
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+
+                </div>
+
+
+                <div
+                    class="calendar-grid"
+                    id="calendar-grid"
+                ></div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+
+<script>
+
+    const firebaseConfig = {
+
+        apiKey: "AIzaSyDqAZiiw7SKc4SLSsWug1G3e_f5-u-pkYw",
+
+        authDomain: "travel-planner-a9d51.firebaseapp.com",
+
+        projectId: "travel-planner-a9d51",
+
+        storageBucket: "travel-planner-a9d51.firebasestorage.app",
+
+        messagingSenderId: "966221614343",
+
+        appId: "1:966221614343:web:f48783ed75140a8be589a2",
+
+        measurementId: "G-6RSREEXYS4"
+
+    };
+
+
+    firebase.initializeApp(firebaseConfig);
+
+    window.db = firebase.firestore();
+
+</script>
+
+
+<!-- 내 JS -->
+<script src="script.js"></script>
+```
+
+</body>
+
+</html>
 <body>
 
     <div class="app-container">
