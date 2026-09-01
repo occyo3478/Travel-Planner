@@ -1,10 +1,4 @@
-if (window.__travelPlannerScriptLoaded) {
-    console.log('script.js 중복 실행 방지');
-} else {
-
-    window.__travelPlannerScriptLoaded = true;
-
-    document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
 
     // =========================================================
     // Firebase 설정
