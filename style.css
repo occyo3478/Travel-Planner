@@ -282,15 +282,28 @@ select {
     z-index: 50;
 }
 
+.user-welcome {
+    min-width: 0;
+}
+
 .user-welcome h2 {
     font-size: 1.25rem;
     font-weight: 600;
+
+    /* 글씨가 잘리지 않도록 */
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-break: keep-all;
 }
 
 .user-welcome p {
     margin-top: .15rem;
     font-size: .875rem;
     color: var(--text-muted);
+
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-break: keep-all;
 }
 
 .actions {
@@ -579,17 +592,17 @@ select {
     transition: opacity .2s, transform .2s;
 }
 
-.notification-dropdown {
-    width: 300px;
-    z-index: 100;
-    overflow: hidden;
-}
-
 .notification-dropdown.show,
 .profile-dropdown.show {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
+}
+
+.notification-dropdown {
+    width: 300px;
+    z-index: 100;
+    overflow: hidden;
 }
 
 .notification-header,
@@ -909,6 +922,10 @@ select {
     font-size: 1.75rem;
     color: var(--text-main);
     margin-top: 1rem;
+
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-break: keep-all;
 }
 
 .add-page-header .back-link {
@@ -977,6 +994,7 @@ select {
     padding-bottom: .8rem;
     color: var(--text-muted);
     font-weight: 600;
+    white-space: nowrap;
 }
 
 #add-btn {
@@ -1046,6 +1064,8 @@ select {
         align-items: center;
         gap: 10px;
 
+        min-width: 0;
+
         font-size: 1.2rem;
         font-weight: 700;
         color: var(--text-main);
@@ -1056,6 +1076,7 @@ select {
     .mobile-logo i {
         color: var(--primary-color);
         font-size: 1.4rem;
+        flex-shrink: 0;
     }
 
     .mobile-logo > span > span {
@@ -1068,6 +1089,8 @@ select {
 
         display: flex;
         align-items: center;
+
+        flex-shrink: 0;
     }
 
     .btn-icon {
@@ -1139,19 +1162,39 @@ select {
 
     .mobile-welcome {
         display: block;
+
+        width: 100%;
+        min-width: 0;
+
         margin-bottom: 1.5rem;
     }
 
     .mobile-welcome h2 {
+        width: 100%;
+        min-width: 0;
+
         font-size: 1.5rem;
-        line-height: 1.3;
+        line-height: 1.4;
         font-weight: 700;
+
         margin-bottom: .4rem;
+
+        white-space: normal;
+        overflow-wrap: break-word;
+        word-break: keep-all;
     }
 
     .mobile-welcome p {
+        width: 100%;
+        min-width: 0;
+
         font-size: .95rem;
+        line-height: 1.5;
         color: var(--text-main);
+
+        white-space: normal;
+        overflow-wrap: break-word;
+        word-break: keep-all;
     }
 
 
@@ -1308,11 +1351,21 @@ select {
     }
 
     .add-page-header {
+        width: 100%;
+        max-width: 600px;
+
         margin-bottom: 1.5rem;
     }
 
     .add-page-header h1 {
+        width: 100%;
+
         font-size: 1.4rem;
+        line-height: 1.4;
+
+        white-space: normal;
+        overflow-wrap: break-word;
+        word-break: keep-all;
     }
 
     .add-page-header .back-link {
@@ -1327,38 +1380,68 @@ select {
         border-radius: .75rem;
     }
 
-    /* 모바일 시작일 / 종료일 */
+
+    /* -------------------------
+       Mobile Start / End Date
+    ------------------------- */
+
     .date-range-group {
         display: flex;
-        width: 100%;
-        gap: .5rem;
         align-items: flex-end;
+
+        width: 100%;
+
+        gap: .5rem;
     }
 
     .date-input {
         flex: 1 1 0;
         min-width: 0;
-        width: 0;
+
+        /*
+         * 기존 width: 0 제거
+         * input[type="date"]가 정상적으로 크기를 계산하도록 함
+         */
+        width: auto;
     }
 
     .date-input .input-group {
-        min-width: 0;
         width: 100%;
+        min-width: 0;
     }
 
     .date-input input[type="date"] {
+        display: block;
+
         width: 100%;
         min-width: 0;
         max-width: 100%;
-        padding-left: .65rem;
-        padding-right: .4rem;
-        font-size: .9rem;
+
+        height: 48px;
+
+        padding: 0 .45rem;
+
+        font-size: .85rem;
+        line-height: normal;
+
+        box-sizing: border-box;
     }
 
     .date-separator {
-        flex-shrink: 0;
+        flex: 0 0 auto;
+
         padding-bottom: .75rem;
+
+        color: var(--text-muted);
+        font-weight: 600;
+
+        white-space: nowrap;
     }
+
+
+    /* -------------------------
+       Profile Dropdown
+    ------------------------- */
 
     .profile-dropdown {
         right: 0;
