@@ -269,9 +269,10 @@ select {
 ========================================================= */
 
 .top-bar {
-    height: 80px;
     min-height: 80px;
-    padding: 0 2rem;
+    height: auto;
+    padding: 1rem 2rem;
+    gap: 1.5rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -289,21 +290,25 @@ select {
 .user-welcome h2 {
     font-size: 1.25rem;
     font-weight: 600;
+    line-height: 1.5;
 
     /* 글씨가 잘리지 않도록 */
     white-space: normal;
     overflow-wrap: break-word;
     word-break: keep-all;
+    overflow: visible;
 }
 
 .user-welcome p {
     margin-top: .15rem;
     font-size: .875rem;
+    line-height: 1.5;
     color: var(--text-muted);
 
     white-space: normal;
     overflow-wrap: break-word;
     word-break: keep-all;
+    overflow: visible;
 }
 
 .actions {
