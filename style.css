@@ -1470,3 +1470,43 @@ select {
         display: none !important;
     }
 }
+
+/* =========================================================
+   모바일 환영 문구 가림 문제 수정
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+    /* 상단 고정바가 sidebar 위를 덮지 않도록
+       sidebar 자체를 64px 아래에서 시작 */
+    .sidebar {
+        padding-top: calc(1rem + 64px);
+    }
+
+    /* top-bar는 fixed라서 main-content의 padding-top으로
+       공간을 만들 필요가 없음 */
+    .main-content {
+        padding-top: 0;
+    }
+
+    /* 환영 문구가 반드시 보이도록 */
+    .mobile-welcome {
+        position: relative;
+        z-index: 1;
+        display: block;
+        width: 100%;
+        min-width: 0;
+        margin-bottom: 1.5rem;
+        overflow: visible;
+    }
+
+    .mobile-welcome h2,
+    .mobile-welcome p {
+        position: relative;
+        z-index: 1;
+        overflow: visible;
+        white-space: normal;
+        overflow-wrap: break-word;
+        word-break: keep-all;
+    }
+}
