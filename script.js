@@ -214,8 +214,11 @@ if (!window.travelPlannerInitialized) {
                         }
 
                         const startDate = parseLocalDate(trip.startDate);
+                        const endDate = parseLocalDate(trip.endDate);
 
-                        return !Number.isNaN(startDate.getTime()) && startDate >= today;
+                        return !Number.isNaN(startDate.getTime()) &&
+                            !Number.isNaN(endDate.getTime()) &&
+                            endDate >= today;
                     })
                     .sort((a, b) => {
                         return parseLocalDate(a.startDate) - parseLocalDate(b.startDate);
@@ -247,13 +250,23 @@ if (!window.travelPlannerInitialized) {
                                 </div>
                             </div>
                         `;
-                    } else {
+                    } else if (dDay > 0) {
                         li.innerHTML = `
                             <div class="noti-content">
                                 <span class="d-day-badge d-day-upcoming">D-${dDay}</span>
                                 <div class="noti-text">
                                     <strong>${escapeHtml(trip.destination || '여행')}</strong>
                                     <p>여행 시작까지 <strong>D-${dDay}</strong></p>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        li.innerHTML = `
+                            <div class="noti-content">
+                                <span class="d-day-badge d-day-today">진행중</span>
+                                <div class="noti-text">
+                                    <strong>${escapeHtml(trip.destination || '여행')}</strong>
+                                    <p>현재 여행이 진행 중입니다! ✈️</p>
                                 </div>
                             </div>
                         `;
@@ -369,14 +382,18 @@ if (!window.travelPlannerInitialized) {
 
                 let filtered = tripsToRender.filter(trip => {
                     const start = parseLocalDate(trip.startDate);
+                    const end = parseLocalDate(trip.endDate);
 
-                    if (Number.isNaN(start.getTime())) {
+                    if (
+                        Number.isNaN(start.getTime()) ||
+                        Number.isNaN(end.getTime())
+                    ) {
                         return false;
                     }
 
                     return currentTab === 'upcoming'
-                        ? start >= today
-                        : start < today;
+                        ? end >= today
+                        : end < today;
                 });
 
                 filtered.sort((a, b) => {
@@ -403,9 +420,18 @@ if (!window.travelPlannerInitialized) {
                     const card = document.createElement('div');
                     card.className = 'trip-card';
 
+                    const start = parseLocalDate(trip.startDate);
+                    const end = parseLocalDate(trip.endDate);
+
+                    let statusText = '';
+
+                    if (start <= today && end >= today) {
+                        statusText = '<span class="trip-status">진행중</span>';
+                    }
+
                     card.innerHTML = `
                         <div class="trip-info">
-                            <h3>${escapeHtml(trip.destination)}</h3>
+                            <h3>${escapeHtml(trip.destination)} ${statusText}</h3>
                             <p>${escapeHtml(trip.startDate)} ~ ${escapeHtml(trip.endDate)}</p>
                         </div>
                         <div class="trip-card-actions">
@@ -468,13 +494,13 @@ if (!window.travelPlannerInitialized) {
                 today.setHours(0, 0, 0, 0);
 
                 const upcoming = trips.filter(trip => {
-                    const date = parseLocalDate(trip.startDate);
+                    const date = parseLocalDate(trip.endDate);
 
                     return !Number.isNaN(date.getTime()) && date >= today;
                 }).length;
 
                 const past = trips.filter(trip => {
-                    const date = parseLocalDate(trip.startDate);
+                    const date = parseLocalDate(trip.endDate);
 
                     return !Number.isNaN(date.getTime()) && date < today;
                 }).length;
