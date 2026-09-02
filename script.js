@@ -18,9 +18,15 @@ if (!window.travelPlannerInitialized) {
         let currentCalendarDate = new Date();
         let currentTrip = null;
 
-        const isDetailPage = document.getElementById('map') && document.getElementById('places-list');
-        const isAddPage = document.getElementById('add-btn');
-        const isIndexPage = document.getElementById('trip-list');
+        const isDetailPage =
+            document.getElementById('map') &&
+            document.getElementById('places-list');
+
+        const isAddPage =
+            document.getElementById('add-btn');
+
+        const isIndexPage =
+            document.getElementById('trip-list');
 
         if (isDetailPage) {
             initDetailPage();
@@ -32,82 +38,201 @@ if (!window.travelPlannerInitialized) {
 
         async function loadTrips() {
             try {
-                const snapshot = await db.collection('trips').get();
+                const snapshot =
+                    await db.collection('trips').get();
 
                 trips = snapshot.docs.map(doc => {
                     const data = doc.data();
 
                     return {
                         id: String(doc.id),
-                        destination: data.destination || data.name || '',
-                        startDate: data.startDate || data.date || '',
-                        endDate: data.endDate || data.startDate || data.date || '',
-                        activity: data.activity || '',
-                        places: Array.isArray(data.places) ? data.places : []
+                        destination:
+                            data.destination ||
+                            data.name ||
+                            '',
+                        startDate:
+                            data.startDate ||
+                            data.date ||
+                            '',
+                        endDate:
+                            data.endDate ||
+                            data.startDate ||
+                            data.date ||
+                            '',
+                        activity:
+                            data.activity ||
+                            '',
+                        places:
+                            Array.isArray(data.places)
+                                ? data.places
+                                : []
                     };
                 });
 
-                console.log('Firestore 여행 데이터:', trips);
+                console.log(
+                    'Firestore 여행 데이터:',
+                    trips
+                );
+
                 return trips;
 
             } catch (error) {
-                console.error('Firestore 불러오기 실패:', error);
-                alert('Firestore에서 여행 정보를 불러오지 못했습니다.');
+                console.error(
+                    'Firestore 불러오기 실패:',
+                    error
+                );
+
+                alert(
+                    'Firestore에서 여행 정보를 불러오지 못했습니다.'
+                );
+
                 trips = [];
+
                 return [];
             }
         }
 
         async function saveTrip(trip) {
             if (!trip) {
-                console.error('저장할 여행이 없습니다.');
+                console.error(
+                    '저장할 여행이 없습니다.'
+                );
+
                 return false;
             }
 
             try {
-                const id = String(trip.id);
+                const id =
+                    String(trip.id);
 
-                await db.collection('trips').doc(id).set({
-                    id: trip.id,
-                    destination: trip.destination || '',
-                    startDate: trip.startDate || '',
-                    endDate: trip.endDate || '',
-                    activity: trip.activity || '',
-                    places: Array.isArray(trip.places) ? trip.places : []
-                }, { merge: true });
+                await db
+                    .collection('trips')
+                    .doc(id)
+                    .set({
+                        id: trip.id,
+                        destination:
+                            trip.destination || '',
+                        startDate:
+                            trip.startDate || '',
+                        endDate:
+                            trip.endDate || '',
+                        activity:
+                            trip.activity || '',
+                        places:
+                            Array.isArray(trip.places)
+                                ? trip.places
+                                : []
+                    }, {
+                        merge: true
+                    });
 
-                console.log('여행 저장 완료:', id);
+                console.log(
+                    '여행 저장 완료:',
+                    id
+                );
+
                 return true;
 
             } catch (error) {
-                console.error('여행 저장 실패:', error);
-                alert('여행 저장에 실패했습니다.');
+                console.error(
+                    '여행 저장 실패:',
+                    error
+                );
+
+                alert(
+                    '여행 저장에 실패했습니다.'
+                );
+
                 return false;
             }
         }
 
         function initIndexPage() {
-            const tripList = document.getElementById('trip-list');
-            const calendarView = document.getElementById('calendar-view');
-            const emptyState = document.getElementById('empty-state');
-            const totalTripsEl = document.getElementById('total-trips');
-            const upcomingTripsEl = document.getElementById('upcoming-trips');
-            const pastTripsEl = document.getElementById('past-trips');
-            const tabBtns = document.querySelectorAll('.tab-btn');
-            const viewBtns = document.querySelectorAll('.view-btn');
-            const searchNameInput = document.getElementById('search-name');
-            const searchYearSelect = document.getElementById('search-year');
-            const searchMonthSelect = document.getElementById('search-month');
-            const searchBtn = document.getElementById('search-btn');
+            const tripList =
+                document.getElementById(
+                    'trip-list'
+                );
 
-            if (searchYearSelect && searchYearSelect.options.length <= 1) {
-                const currentYear = new Date().getFullYear();
+            const calendarView =
+                document.getElementById(
+                    'calendar-view'
+                );
 
-                for (let year = currentYear - 5; year <= currentYear + 5; year++) {
-                    const option = document.createElement('option');
+            const emptyState =
+                document.getElementById(
+                    'empty-state'
+                );
+
+            const totalTripsEl =
+                document.getElementById(
+                    'total-trips'
+                );
+
+            const upcomingTripsEl =
+                document.getElementById(
+                    'upcoming-trips'
+                );
+
+            const pastTripsEl =
+                document.getElementById(
+                    'past-trips'
+                );
+
+            const tabBtns =
+                document.querySelectorAll(
+                    '.tab-btn'
+                );
+
+            const viewBtns =
+                document.querySelectorAll(
+                    '.view-btn'
+                );
+
+            const searchNameInput =
+                document.getElementById(
+                    'search-name'
+                );
+
+            const searchYearSelect =
+                document.getElementById(
+                    'search-year'
+                );
+
+            const searchMonthSelect =
+                document.getElementById(
+                    'search-month'
+                );
+
+            const searchBtn =
+                document.getElementById(
+                    'search-btn'
+                );
+
+            if (
+                searchYearSelect &&
+                searchYearSelect.options.length <= 1
+            ) {
+                const currentYear =
+                    new Date().getFullYear();
+
+                for (
+                    let year = currentYear - 5;
+                    year <= currentYear + 5;
+                    year++
+                ) {
+                    const option =
+                        document.createElement(
+                            'option'
+                        );
+
                     option.value = year;
-                    option.textContent = `${year}년`;
-                    searchYearSelect.appendChild(option);
+
+                    option.textContent =
+                        `${year}년`;
+
+                    searchYearSelect.appendChild(
+                        option
+                    );
                 }
             }
 
@@ -117,130 +242,283 @@ if (!window.travelPlannerInitialized) {
             });
 
             tabBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    tabBtns.forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    currentTab = btn.dataset.tab;
-                    renderTrips();
-                });
+                btn.addEventListener(
+                    'click',
+                    () => {
+                        tabBtns.forEach(
+                            b =>
+                                b.classList.remove(
+                                    'active'
+                                )
+                        );
+
+                        btn.classList.add(
+                            'active'
+                        );
+
+                        currentTab =
+                            btn.dataset.tab;
+
+                        renderTrips();
+                    }
+                );
             });
 
             viewBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const title = btn.getAttribute('title') || '';
+                btn.addEventListener(
+                    'click',
+                    () => {
+                        const title =
+                            btn.getAttribute(
+                                'title'
+                            ) || '';
 
-                    if (title.includes('리스트')) {
-                        currentView = 'list';
+                        if (
+                            title.includes(
+                                '리스트'
+                            )
+                        ) {
+                            currentView =
+                                'list';
 
-                        if (tripList) tripList.style.display = 'flex';
-                        if (calendarView) calendarView.style.display = 'none';
+                            if (tripList) {
+                                tripList.style.display =
+                                    'flex';
+                            }
 
-                        if (viewBtns[0]) viewBtns[0].classList.add('active');
-                        if (viewBtns[1]) viewBtns[1].classList.remove('active');
+                            if (calendarView) {
+                                calendarView.style.display =
+                                    'none';
+                            }
 
-                        renderTrips();
+                            if (viewBtns[0]) {
+                                viewBtns[0].classList.add(
+                                    'active'
+                                );
+                            }
 
-                    } else {
-                        currentView = 'calendar';
+                            if (viewBtns[1]) {
+                                viewBtns[1].classList.remove(
+                                    'active'
+                                );
+                            }
 
-                        if (tripList) tripList.style.display = 'none';
-                        if (calendarView) calendarView.style.display = 'flex';
+                            renderTrips();
 
-                        if (viewBtns[0]) viewBtns[0].classList.remove('active');
-                        if (viewBtns[1]) viewBtns[1].classList.add('active');
+                        } else {
+                            currentView =
+                                'calendar';
 
-                        renderCalendar();
+                            if (tripList) {
+                                tripList.style.display =
+                                    'none';
+                            }
+
+                            if (calendarView) {
+                                calendarView.style.display =
+                                    'flex';
+                            }
+
+                            if (viewBtns[0]) {
+                                viewBtns[0].classList.remove(
+                                    'active'
+                                );
+                            }
+
+                            if (viewBtns[1]) {
+                                viewBtns[1].classList.add(
+                                    'active'
+                                );
+                            }
+
+                            renderCalendar();
+                        }
                     }
-                });
+                );
             });
 
             if (searchBtn) {
-                searchBtn.addEventListener('click', performSearch);
+                searchBtn.addEventListener(
+                    'click',
+                    performSearch
+                );
             }
 
             if (searchNameInput) {
-                searchNameInput.addEventListener('keypress', e => {
-                    if (e.key === 'Enter') performSearch();
-                });
+                searchNameInput.addEventListener(
+                    'keypress',
+                    e => {
+                        if (e.key === 'Enter') {
+                            performSearch();
+                        }
+                    }
+                );
             }
 
             function performSearch() {
-                const term = searchNameInput
-                    ? searchNameInput.value.trim().toLowerCase()
-                    : '';
+                const term =
+                    searchNameInput
+                        ? searchNameInput.value
+                              .trim()
+                              .toLowerCase()
+                        : '';
 
-                const year = searchYearSelect ? searchYearSelect.value : '';
-                const month = searchMonthSelect ? searchMonthSelect.value : '';
+                const year =
+                    searchYearSelect
+                        ? searchYearSelect.value
+                        : '';
 
-                const filtered = trips.filter(t => {
-                    const date = new Date(t.startDate);
+                const month =
+                    searchMonthSelect
+                        ? searchMonthSelect.value
+                        : '';
 
-                    const nameMatch =
-                        (t.destination || '').toLowerCase().includes(term);
+                const filtered =
+                    trips.filter(t => {
+                        const date =
+                            new Date(
+                                t.startDate
+                            );
 
-                    const yearMatch =
-                        !year || String(date.getFullYear()) === String(year);
+                        const nameMatch =
+                            (
+                                t.destination ||
+                                ''
+                            )
+                                .toLowerCase()
+                                .includes(term);
 
-                    const monthMatch =
-                        !month || String(date.getMonth() + 1) === String(month);
+                        const yearMatch =
+                            !year ||
+                            String(
+                                date.getFullYear()
+                            ) ===
+                                String(year);
 
-                    return nameMatch && yearMatch && monthMatch;
-                });
+                        const monthMatch =
+                            !month ||
+                            String(
+                                date.getMonth() + 1
+                            ) ===
+                                String(month);
+
+                        return (
+                            nameMatch &&
+                            yearMatch &&
+                            monthMatch
+                        );
+                    });
 
                 renderTrips(filtered);
             }
 
-            function renderTrips(tripsToRender = trips) {
+            function renderTrips(
+                tripsToRender = trips
+            ) {
                 if (!tripList) return;
 
                 tripList
-                    .querySelectorAll('.trip-card')
-                    .forEach(card => card.remove());
+                    .querySelectorAll(
+                        '.trip-card'
+                    )
+                    .forEach(
+                        card =>
+                            card.remove()
+                    );
 
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
+                const today =
+                    new Date();
 
-                let filtered = tripsToRender.filter(t => {
-                    const start = new Date(t.startDate);
-                    start.setHours(0, 0, 0, 0);
+                today.setHours(
+                    0,
+                    0,
+                    0,
+                    0
+                );
 
-                    return currentTab === 'upcoming'
-                        ? start >= today
-                        : start < today;
-                });
+                let filtered =
+                    tripsToRender.filter(t => {
+                        const start =
+                            new Date(
+                                t.startDate
+                            );
+
+                        start.setHours(
+                            0,
+                            0,
+                            0,
+                            0
+                        );
+
+                        return currentTab ===
+                            'upcoming'
+                            ? start >= today
+                            : start < today;
+                    });
 
                 filtered.sort(
                     (a, b) =>
-                        new Date(a.startDate) - new Date(b.startDate)
+                        new Date(
+                            a.startDate
+                        ) -
+                        new Date(
+                            b.startDate
+                        )
                 );
 
-                if (currentTab === 'past') {
+                if (
+                    currentTab ===
+                    'past'
+                ) {
                     filtered.reverse();
                 }
 
-                if (filtered.length === 0) {
-                    if (emptyState) emptyState.style.display = 'flex';
+                if (
+                    filtered.length ===
+                    0
+                ) {
+                    if (emptyState) {
+                        emptyState.style.display =
+                            'flex';
+                    }
+
                     return;
                 }
 
-                if (emptyState) emptyState.style.display = 'none';
+                if (emptyState) {
+                    emptyState.style.display =
+                        'none';
+                }
 
                 filtered.forEach(t => {
-                    const card = document.createElement('div');
-                    card.className = 'trip-card';
+                    const card =
+                        document.createElement(
+                            'div'
+                        );
+
+                    card.className =
+                        'trip-card';
 
                     card.innerHTML = `
                         <div class="trip-info">
-                            <h3>${escapeHtml(t.destination)}</h3>
-                            <p>${escapeHtml(t.startDate)} ~ ${escapeHtml(t.endDate)}</p>
+                            <h3>${escapeHtml(
+                                t.destination
+                            )}</h3>
+
+                            <p>${escapeHtml(
+                                t.startDate
+                            )} ~ ${escapeHtml(
+                                t.endDate
+                            )}</p>
                         </div>
 
                         <div class="trip-card-actions">
+
                             <button
                                 class="edit-trip-btn"
                                 type="button"
                                 title="여행 이름 수정">
-                                <i class="fa-solid fa-pen"></i>
+                                <i class="fa-solid fa-pen-to-square"></i>
                             </button>
 
                             <button
@@ -249,66 +527,112 @@ if (!window.travelPlannerInitialized) {
                                 title="여행 삭제">
                                 <i class="fa-solid fa-trash"></i>
                             </button>
+
                         </div>
                     `;
 
                     const editBtn =
-                        card.querySelector('.edit-trip-btn');
+                        card.querySelector(
+                            '.edit-trip-btn'
+                        );
 
-                    editBtn.addEventListener('click', async e => {
-                        e.stopPropagation();
-                        await editTripName(t);
-                    });
+                    editBtn.addEventListener(
+                        'click',
+                        async e => {
+                            e.stopPropagation();
+
+                            await editTripName(
+                                t
+                            );
+                        }
+                    );
 
                     const deleteBtn =
-                        card.querySelector('.delete-trip-btn');
+                        card.querySelector(
+                            '.delete-trip-btn'
+                        );
 
-                    deleteBtn.addEventListener('click', async e => {
-                        e.stopPropagation();
-                        await deleteTrip(t.id);
-                    });
+                    deleteBtn.addEventListener(
+                        'click',
+                        async e => {
+                            e.stopPropagation();
 
-                    card.addEventListener('click', () => {
-                        window.location.href =
-                            `trip_detail.html?id=${encodeURIComponent(String(t.id))}`;
-                    });
+                            await deleteTrip(
+                                t.id
+                            );
+                        }
+                    );
 
-                    tripList.appendChild(card);
+                    card.addEventListener(
+                        'click',
+                        () => {
+                            window.location.href =
+                                `trip_detail.html?id=${encodeURIComponent(
+                                    String(t.id)
+                                )}`;
+                        }
+                    );
+
+                    tripList.appendChild(
+                        card
+                    );
                 });
             }
 
-            async function editTripName(trip) {
+            async function editTripName(
+                trip
+            ) {
                 if (!trip) return;
 
-                const currentName = trip.destination || '';
+                const currentName =
+                    trip.destination || '';
 
-                const newName = prompt(
-                    '여행 이름을 수정해주세요.',
-                    currentName
-                );
+                const newName =
+                    prompt(
+                        '여행 이름을 수정해주세요.',
+                        currentName
+                    );
 
-                if (newName === null) return;
-
-                const trimmedName = newName.trim();
-
-                if (!trimmedName) {
-                    alert('여행 이름을 입력해주세요.');
+                if (
+                    newName === null
+                ) {
                     return;
                 }
 
-                if (trimmedName === currentName) return;
+                const trimmedName =
+                    newName.trim();
+
+                if (!trimmedName) {
+                    alert(
+                        '여행 이름을 입력해주세요.'
+                    );
+
+                    return;
+                }
+
+                if (
+                    trimmedName ===
+                    currentName
+                ) {
+                    return;
+                }
 
                 try {
                     await db
                         .collection('trips')
-                        .doc(String(trip.id))
+                        .doc(
+                            String(trip.id)
+                        )
                         .update({
-                            destination: trimmedName
+                            destination:
+                                trimmedName
                         });
 
-                    trip.destination = trimmedName;
+                    trip.destination =
+                        trimmedName;
 
                     renderTrips();
+
                     updateStats();
 
                     console.log(
@@ -318,88 +642,163 @@ if (!window.travelPlannerInitialized) {
                     );
 
                 } catch (error) {
-                    console.error('여행 이름 수정 실패:', error);
-                    alert('여행 이름 수정에 실패했습니다.');
+                    console.error(
+                        '여행 이름 수정 실패:',
+                        error
+                    );
+
+                    alert(
+                        '여행 이름 수정에 실패했습니다.'
+                    );
                 }
             }
 
-            async function deleteTrip(id) {
-                if (!confirm('정말 이 여행 일정을 삭제하시겠습니까?')) {
+            async function deleteTrip(
+                id
+            ) {
+                if (
+                    !confirm(
+                        '정말 이 여행 일정을 삭제하시겠습니까?'
+                    )
+                ) {
                     return;
                 }
 
                 try {
                     await db
                         .collection('trips')
-                        .doc(String(id))
+                        .doc(
+                            String(id)
+                        )
                         .delete();
 
-                    trips = trips.filter(
-                        t => String(t.id) !== String(id)
-                    );
+                    trips =
+                        trips.filter(
+                            t =>
+                                String(
+                                    t.id
+                                ) !==
+                                String(id)
+                        );
 
                     renderTrips();
+
                     updateStats();
 
                 } catch (error) {
-                    console.error('삭제 실패:', error);
-                    alert('여행 삭제에 실패했습니다.');
+                    console.error(
+                        '삭제 실패:',
+                        error
+                    );
+
+                    alert(
+                        '여행 삭제에 실패했습니다.'
+                    );
                 }
             }
 
             function updateStats() {
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
+                const today =
+                    new Date();
 
-                const upcoming = trips.filter(t => {
-                    const date = new Date(t.startDate);
-                    date.setHours(0, 0, 0, 0);
-                    return date >= today;
-                }).length;
+                today.setHours(
+                    0,
+                    0,
+                    0,
+                    0
+                );
 
-                const past = trips.filter(t => {
-                    const date = new Date(t.startDate);
-                    date.setHours(0, 0, 0, 0);
-                    return date < today;
-                }).length;
+                const upcoming =
+                    trips.filter(t => {
+                        const date =
+                            new Date(
+                                t.startDate
+                            );
+
+                        date.setHours(
+                            0,
+                            0,
+                            0,
+                            0
+                        );
+
+                        return date >= today;
+                    }).length;
+
+                const past =
+                    trips.filter(t => {
+                        const date =
+                            new Date(
+                                t.startDate
+                            );
+
+                        date.setHours(
+                            0,
+                            0,
+                            0,
+                            0
+                        );
+
+                        return date < today;
+                    }).length;
 
                 if (totalTripsEl) {
-                    totalTripsEl.textContent = trips.length;
+                    totalTripsEl.textContent =
+                        trips.length;
                 }
 
                 if (upcomingTripsEl) {
-                    upcomingTripsEl.textContent = upcoming;
+                    upcomingTripsEl.textContent =
+                        upcoming;
                 }
 
                 if (pastTripsEl) {
-                    pastTripsEl.textContent = past;
+                    pastTripsEl.textContent =
+                        past;
                 }
             }
 
             function renderCalendar() {
                 const grid =
-                    document.getElementById('calendar-grid');
+                    document.getElementById(
+                        'calendar-grid'
+                    );
 
                 const monthDisplay =
-                    document.getElementById('current-month-display');
+                    document.getElementById(
+                        'current-month-display'
+                    );
 
                 if (!grid) return;
 
                 grid.innerHTML = '';
 
-                const year = currentCalendarDate.getFullYear();
-                const month = currentCalendarDate.getMonth();
+                const year =
+                    currentCalendarDate.getFullYear();
+
+                const month =
+                    currentCalendarDate.getMonth();
 
                 if (monthDisplay) {
                     monthDisplay.textContent =
-                        `${year}년 ${month + 1}월`;
+                        `${year}년 ${
+                            month + 1
+                        }월`;
                 }
 
                 const firstDay =
-                    new Date(year, month, 1);
+                    new Date(
+                        year,
+                        month,
+                        1
+                    );
 
                 const lastDay =
-                    new Date(year, month + 1, 0);
+                    new Date(
+                        year,
+                        month + 1,
+                        0
+                    );
 
                 const daysInMonth =
                     lastDay.getDate();
@@ -407,12 +806,22 @@ if (!window.travelPlannerInitialized) {
                 const startDay =
                     firstDay.getDay();
 
-                for (let i = 0; i < startDay; i++) {
+                for (
+                    let i = 0;
+                    i < startDay;
+                    i++
+                ) {
                     const empty =
-                        document.createElement('div');
+                        document.createElement(
+                            'div'
+                        );
 
-                    empty.className = 'calendar-day empty';
-                    grid.appendChild(empty);
+                    empty.className =
+                        'calendar-day empty';
+
+                    grid.appendChild(
+                        empty
+                    );
                 }
 
                 for (
@@ -421,172 +830,260 @@ if (!window.travelPlannerInitialized) {
                     day++
                 ) {
                     const div =
-                        document.createElement('div');
-
-                    div.className = 'calendar-day';
-
-                    const number =
-                        document.createElement('span');
-
-                    number.textContent = day;
-                    div.appendChild(number);
-
-                    const dateStr =
-                        `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-
-                    const dayTrips =
-                        trips.filter(t =>
-                            dateStr >= t.startDate &&
-                            dateStr <= t.endDate
+                        document.createElement(
+                            'div'
                         );
 
-                    dayTrips.forEach(t => {
-                        const label =
-                            document.createElement('div');
+                    div.className =
+                        'calendar-day';
 
-                        label.className = 'trip-label';
-                        label.textContent = t.destination;
+                    const number =
+                        document.createElement(
+                            'span'
+                        );
 
-                        div.appendChild(label);
-                    });
+                    number.textContent =
+                        day;
 
-                    grid.appendChild(div);
+                    div.appendChild(
+                        number
+                    );
+
+                    const dateStr =
+                        `${year}-${String(
+                            month + 1
+                        ).padStart(
+                            2,
+                            '0'
+                        )}-${String(
+                            day
+                        ).padStart(
+                            2,
+                            '0'
+                        )}`;
+
+                    const dayTrips =
+                        trips.filter(
+                            t =>
+                                dateStr >=
+                                    t.startDate &&
+                                dateStr <=
+                                    t.endDate
+                        );
+
+                    dayTrips.forEach(
+                        t => {
+                            const label =
+                                document.createElement(
+                                    'div'
+                                );
+
+                            label.className =
+                                'trip-label';
+
+                            label.textContent =
+                                t.destination;
+
+                            div.appendChild(
+                                label
+                            );
+                        }
+                    );
+
+                    grid.appendChild(
+                        div
+                    );
                 }
             }
 
             const prev =
-                document.getElementById('prev-month');
+                document.getElementById(
+                    'prev-month'
+                );
 
             const next =
-                document.getElementById('next-month');
+                document.getElementById(
+                    'next-month'
+                );
 
             if (prev) {
-                prev.addEventListener('click', () => {
-                    currentCalendarDate.setMonth(
-                        currentCalendarDate.getMonth() - 1
-                    );
+                prev.addEventListener(
+                    'click',
+                    () => {
+                        currentCalendarDate.setMonth(
+                            currentCalendarDate.getMonth() -
+                                1
+                        );
 
-                    renderCalendar();
-                });
+                        renderCalendar();
+                    }
+                );
             }
 
             if (next) {
-                next.addEventListener('click', () => {
-                    currentCalendarDate.setMonth(
-                        currentCalendarDate.getMonth() + 1
-                    );
+                next.addEventListener(
+                    'click',
+                    () => {
+                        currentCalendarDate.setMonth(
+                            currentCalendarDate.getMonth() +
+                                1
+                        );
 
-                    renderCalendar();
-                });
+                        renderCalendar();
+                    }
+                );
             }
         }
 
-                                      function initAddPage() {
+        function initAddPage() {
             const addBtn =
-                document.getElementById('add-btn');
+                document.getElementById(
+                    'add-btn'
+                );
 
-            if (!addBtn ||
-                addBtn.dataset.initialized === 'true') {
+            if (
+                !addBtn ||
+                addBtn.dataset.initialized ===
+                    'true'
+            ) {
                 return;
             }
 
-            addBtn.dataset.initialized = 'true';
+            addBtn.dataset.initialized =
+                'true';
 
             const destination =
-                document.getElementById('destination');
+                document.getElementById(
+                    'destination'
+                );
 
             const startDate =
-                document.getElementById('start-date');
+                document.getElementById(
+                    'start-date'
+                );
 
             const endDate =
-                document.getElementById('end-date');
+                document.getElementById(
+                    'end-date'
+                );
 
             const activity =
-                document.getElementById('activity');
+                document.getElementById(
+                    'activity'
+                );
 
             let isSaving = false;
 
-            addBtn.addEventListener('click', async () => {
-                if (isSaving) return;
+            addBtn.addEventListener(
+                'click',
+                async () => {
+                    if (isSaving) return;
 
-                const destinationValue =
-                    destination
-                        ? destination.value.trim()
-                        : '';
+                    const destinationValue =
+                        destination
+                            ? destination.value.trim()
+                            : '';
 
-                const startValue =
-                    startDate
-                        ? startDate.value
-                        : '';
+                    const startValue =
+                        startDate
+                            ? startDate.value
+                            : '';
 
-                const endValue =
-                    endDate
-                        ? endDate.value
-                        : '';
+                    const endValue =
+                        endDate
+                            ? endDate.value
+                            : '';
 
-                const activityValue =
-                    activity
-                        ? activity.value.trim()
-                        : '';
+                    const activityValue =
+                        activity
+                            ? activity.value.trim()
+                            : '';
 
-                if (
-                    !destinationValue ||
-                    !startValue ||
-                    !endValue
-                ) {
-                    alert('필수 정보를 입력해주세요.');
-                    return;
-                }
-
-                if (endValue < startValue) {
-                    alert(
-                        '종료일은 시작일보다 빠를 수 없습니다.'
-                    );
-                    return;
-                }
-
-                isSaving = true;
-                addBtn.disabled = true;
-
-                const originalText =
-                    addBtn.innerHTML;
-
-                addBtn.innerHTML =
-                    '<i class="fa-solid fa-spinner fa-spin"></i> 저장 중...';
-
-                const id =
-                    `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-
-                const newTrip = {
-                    id,
-                    destination: destinationValue,
-                    startDate: startValue,
-                    endDate: endValue,
-                    activity: activityValue,
-                    places: []
-                };
-
-                try {
-                    const success =
-                        await saveTrip(newTrip);
-
-                    if (success) {
-                        window.location.href =
-                            'index.html';
+                    if (
+                        !destinationValue ||
+                        !startValue ||
+                        !endValue
+                    ) {
+                        alert(
+                            '필수 정보를 입력해주세요.'
+                        );
 
                         return;
                     }
 
-                } finally {
-                    isSaving = false;
-                    addBtn.disabled = false;
-                    addBtn.innerHTML = originalText;
+                    if (
+                        endValue <
+                        startValue
+                    ) {
+                        alert(
+                            '종료일은 시작일보다 빠를 수 없습니다.'
+                        );
+
+                        return;
+                    }
+
+                    isSaving = true;
+                    addBtn.disabled =
+                        true;
+
+                    const originalText =
+                        addBtn.innerHTML;
+
+                    addBtn.innerHTML =
+                        '<i class="fa-solid fa-spinner fa-spin"></i> 저장 중...';
+
+                    const id =
+                        `${Date.now()}_${Math.random()
+                            .toString(36)
+                            .slice(
+                                2,
+                                8
+                            )}`;
+
+                    const newTrip = {
+                        id,
+                        destination:
+                            destinationValue,
+                        startDate:
+                            startValue,
+                        endDate:
+                            endValue,
+                        activity:
+                            activityValue,
+                        places: []
+                    };
+
+                    try {
+                        const success =
+                            await saveTrip(
+                                newTrip
+                            );
+
+                        if (success) {
+                            window.location.href =
+                                'index.html';
+
+                            return;
+                        }
+
+                    } finally {
+                        isSaving = false;
+
+                        addBtn.disabled =
+                            false;
+
+                        addBtn.innerHTML =
+                            originalText;
+                    }
                 }
-            });
+            );
         }
 
         async function initDetailPage() {
-            if (typeof L === 'undefined') {
+            if (
+                typeof L ===
+                'undefined'
+            ) {
                 console.error(
                     'Leaflet이 로드되지 않았습니다.'
                 );
@@ -607,7 +1104,10 @@ if (!window.travelPlannerInitialized) {
                 params.get('id');
 
             if (!tripId) {
-                alert('여행 ID가 없습니다.');
+                alert(
+                    '여행 ID가 없습니다.'
+                );
+
                 window.location.href =
                     'index.html';
 
@@ -618,7 +1118,9 @@ if (!window.travelPlannerInitialized) {
                 const doc =
                     await db
                         .collection('trips')
-                        .doc(String(tripId))
+                        .doc(
+                            String(tripId)
+                        )
                         .get();
 
                 if (!doc.exists) {
@@ -636,7 +1138,10 @@ if (!window.travelPlannerInitialized) {
                     doc.data();
 
                 currentTrip = {
-                    id: String(doc.id),
+                    id: String(
+                        doc.id
+                    ),
+
                     destination:
                         data.destination ||
                         data.name ||
@@ -658,7 +1163,9 @@ if (!window.travelPlannerInitialized) {
                         '',
 
                     places:
-                        Array.isArray(data.places)
+                        Array.isArray(
+                            data.places
+                        )
                             ? data.places
                             : []
                 };
@@ -677,25 +1184,39 @@ if (!window.travelPlannerInitialized) {
             }
 
             const title =
-                document.getElementById('trip-title');
+                document.getElementById(
+                    'trip-title'
+                );
 
             const dates =
-                document.getElementById('trip-dates');
+                document.getElementById(
+                    'trip-dates'
+                );
 
             const placeInput =
-                document.getElementById('place-input');
+                document.getElementById(
+                    'place-input'
+                );
 
             const addPlaceBtn =
-                document.getElementById('add-place-btn');
+                document.getElementById(
+                    'add-place-btn'
+                );
 
             const placesList =
-                document.getElementById('places-list');
+                document.getElementById(
+                    'places-list'
+                );
 
             const optimizeBtn =
-                document.getElementById('optimize-btn');
+                document.getElementById(
+                    'optimize-btn'
+                );
 
             const mapElement =
-                document.getElementById('map');
+                document.getElementById(
+                    'map'
+                );
 
             if (title) {
                 title.textContent =
@@ -720,11 +1241,15 @@ if (!window.travelPlannerInitialized) {
             }
 
             const map =
-                L.map(mapElement)
-                    .setView(
-                        [37.5665, 126.9780],
-                        10
-                    );
+                L.map(
+                    mapElement
+                ).setView(
+                    [
+                        37.5665,
+                        126.9780
+                    ],
+                    10
+                );
 
             L.tileLayer(
                 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -735,27 +1260,39 @@ if (!window.travelPlannerInitialized) {
                 }
             ).addTo(map);
 
-            setTimeout(() => {
-                map.invalidateSize();
-            }, 300);
+            setTimeout(
+                () => {
+                    map.invalidateSize();
+                },
+                300
+            );
 
             function renderPlaces() {
-                if (!placesList) return;
+                if (!placesList)
+                    return;
 
-                placesList.innerHTML = '';
+                placesList.innerHTML =
+                    '';
 
-                map.eachLayer(layer => {
-                    if (
-                        layer instanceof L.Marker ||
-                        layer instanceof L.Polyline
-                    ) {
-                        map.removeLayer(layer);
+                map.eachLayer(
+                    layer => {
+                        if (
+                            layer instanceof
+                                L.Marker ||
+                            layer instanceof
+                                L.Polyline
+                        ) {
+                            map.removeLayer(
+                                layer
+                            );
+                        }
                     }
-                });
+                );
 
                 if (
                     !currentTrip.places ||
-                    currentTrip.places.length === 0
+                    currentTrip.places.length ===
+                        0
                 ) {
                     placesList.innerHTML = `
                         <div class="empty-places">
@@ -769,162 +1306,205 @@ if (!window.travelPlannerInitialized) {
                 const latlngs = [];
 
                 currentTrip.places.forEach(
-                    (place, index) => {
-
-                    const item =
-                        document.createElement('div');
-
-                    item.className =
-                        'place-item' +
-                        (place.isLocked
-                            ? ' locked'
-                            : '');
-
-                    item.dataset.id =
-                        String(place.id);
-
-                    item.draggable =
-                        !place.isLocked;
-
-                    item.innerHTML = `
-                        <span class="place-number">
-                            ${index + 1}
-                        </span>
-
-                        <span class="place-name">
-                            ${escapeHtml(place.name)}
-                        </span>
-
-                        <button
-                            class="lock-btn ${place.isLocked ? 'active' : ''}"
-                            type="button">
-                            <i class="fa-solid ${
-                                place.isLocked
-                                    ? 'fa-lock'
-                                    : 'fa-lock-open'
-                            }"></i>
-                        </button>
-
-                        <button
-                            class="remove-place-btn"
-                            type="button">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
-                    `;
-
-                    const lockBtn =
-                        item.querySelector(
-                            '.lock-btn'
-                        );
-
-                    lockBtn.addEventListener(
-                        'click',
-                        async e => {
-                            e.stopPropagation();
-
-                            place.isLocked =
-                                !place.isLocked;
-
-                            await saveCurrentTrip();
-
-                            renderPlaces();
-                        }
-                    );
-
-                    const removeBtn =
-                        item.querySelector(
-                            '.remove-place-btn'
-                        );
-
-                    removeBtn.addEventListener(
-                        'click',
-                        async e => {
-                            e.stopPropagation();
-
-                            if (
-                                !confirm(
-                                    `"${place.name}" 장소를 삭제할까요?`
-                                )
-                            ) {
-                                return;
-                            }
-
-                            currentTrip.places =
-                                currentTrip.places.filter(
-                                    p =>
-                                        String(p.id) !==
-                                        String(place.id)
-                                );
-
-                            await saveCurrentTrip();
-
-                            renderPlaces();
-                        }
-                    );
-
-                    if (!place.isLocked) {
-                        item.addEventListener(
-                            'dragstart',
-                            () => {
-                                item.classList.add(
-                                    'dragging'
-                                );
-                            }
-                        );
-
-                        item.addEventListener(
-                            'dragend',
-                            async () => {
-                                item.classList.remove(
-                                    'dragging'
-                                );
-
-                                await updateOrder();
-                            }
-                        );
-                    }
-
-                    placesList.appendChild(item);
-
-                    const lat =
-                        Number(place.lat);
-
-                    const lng =
-                        Number(place.lng);
-
-                    if (
-                        Number.isFinite(lat) &&
-                        Number.isFinite(lng)
-                    ) {
-                        L.marker([
-                            lat,
-                            lng
-                        ])
-                            .addTo(map)
-                            .bindPopup(
-                                `${index + 1}. ${escapeHtml(place.name)}`
+                    (
+                        place,
+                        index
+                    ) => {
+                        const item =
+                            document.createElement(
+                                'div'
                             );
 
-                        latlngs.push([
-                            lat,
-                            lng
-                        ]);
-                    }
-                });
+                        item.className =
+                            'place-item' +
+                            (
+                                place.isLocked
+                                    ? ' locked'
+                                    : ''
+                            );
 
-                if (latlngs.length > 1) {
-                    L.polyline(latlngs)
-                        .addTo(map);
+                        item.dataset.id =
+                            String(
+                                place.id
+                            );
+
+                        item.draggable =
+                            !place.isLocked;
+
+                        item.innerHTML = `
+                            <span class="place-number">
+                                ${index + 1}
+                            </span>
+
+                            <span class="place-name">
+                                ${escapeHtml(
+                                    place.name
+                                )}
+                            </span>
+
+                            <button
+                                class="lock-btn ${
+                                    place.isLocked
+                                        ? 'active'
+                                        : ''
+                                }"
+                                type="button">
+                                <i class="fa-solid ${
+                                    place.isLocked
+                                        ? 'fa-lock'
+                                        : 'fa-lock-open'
+                                }"></i>
+                            </button>
+
+                            <button
+                                class="remove-place-btn"
+                                type="button">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        `;
+
+                        const lockBtn =
+                            item.querySelector(
+                                '.lock-btn'
+                            );
+
+                        lockBtn.addEventListener(
+                            'click',
+                            async e => {
+                                e.stopPropagation();
+
+                                place.isLocked =
+                                    !place.isLocked;
+
+                                await saveCurrentTrip();
+
+                                renderPlaces();
+                            }
+                        );
+
+                        const removeBtn =
+                            item.querySelector(
+                                '.remove-place-btn'
+                            );
+
+                        removeBtn.addEventListener(
+                            'click',
+                            async e => {
+                                e.stopPropagation();
+
+                                if (
+                                    !confirm(
+                                        `"${place.name}" 장소를 삭제할까요?`
+                                    )
+                                ) {
+                                    return;
+                                }
+
+                                currentTrip.places =
+                                    currentTrip.places.filter(
+                                        p =>
+                                            String(
+                                                p.id
+                                            ) !==
+                                            String(
+                                                place.id
+                                            )
+                                    );
+
+                                await saveCurrentTrip();
+
+                                renderPlaces();
+                            }
+                        );
+
+                        if (
+                            !place.isLocked
+                        ) {
+                            item.addEventListener(
+                                'dragstart',
+                                () => {
+                                    item.classList.add(
+                                        'dragging'
+                                    );
+                                }
+                            );
+
+                            item.addEventListener(
+                                'dragend',
+                                async () => {
+                                    item.classList.remove(
+                                        'dragging'
+                                    );
+
+                                    await updateOrder();
+                                }
+                            );
+                        }
+
+                        placesList.appendChild(
+                            item
+                        );
+
+                        const lat =
+                            Number(
+                                place.lat
+                            );
+
+                        const lng =
+                            Number(
+                                place.lng
+                            );
+
+                        if (
+                            Number.isFinite(
+                                lat
+                            ) &&
+                            Number.isFinite(
+                                lng
+                            )
+                        ) {
+                            L.marker([
+                                lat,
+                                lng
+                            ])
+                                .addTo(map)
+                                .bindPopup(
+                                    `${
+                                        index + 1
+                                    }. ${escapeHtml(
+                                        place.name
+                                    )}`
+                                );
+
+                            latlngs.push([
+                                lat,
+                                lng
+                            ]);
+                        }
+                    }
+                );
+
+                if (
+                    latlngs.length >
+                    1
+                ) {
+                    L.polyline(
+                        latlngs
+                    ).addTo(map);
 
                     map.fitBounds(
                         latlngs,
                         {
-                            padding: [40, 40]
+                            padding: [
+                                40,
+                                40
+                            ]
                         }
                     );
 
                 } else if (
-                    latlngs.length === 1
+                    latlngs.length ===
+                    1
                 ) {
                     map.setView(
                         latlngs[0],
@@ -958,17 +1538,22 @@ if (!window.travelPlannerInitialized) {
                     return;
                 }
 
-                if (addPlaceBtn.disabled) {
+                if (
+                    addPlaceBtn.disabled
+                ) {
                     return;
                 }
 
-                addPlaceBtn.disabled = true;
+                addPlaceBtn.disabled =
+                    true;
 
                 try {
                     const url =
                         'https://nominatim.openstreetmap.org/search' +
                         '?format=json&limit=1&q=' +
-                        encodeURIComponent(name);
+                        encodeURIComponent(
+                            name
+                        );
 
                     const response =
                         await fetch(
@@ -981,7 +1566,9 @@ if (!window.travelPlannerInitialized) {
                             }
                         );
 
-                    if (!response.ok) {
+                    if (
+                        !response.ok
+                    ) {
                         throw new Error(
                             `HTTP ${response.status}`
                         );
@@ -992,7 +1579,8 @@ if (!window.travelPlannerInitialized) {
 
                     if (
                         !data ||
-                        data.length === 0
+                        data.length ===
+                            0
                     ) {
                         alert(
                             '장소를 찾을 수 없습니다.'
@@ -1006,17 +1594,27 @@ if (!window.travelPlannerInitialized) {
 
                     const newPlace = {
                         id:
-                            `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+                            `${Date.now()}_${Math.random()
+                                .toString(36)
+                                .slice(
+                                    2,
+                                    8
+                                )}`,
 
                         name,
 
                         lat:
-                            Number(result.lat),
+                            Number(
+                                result.lat
+                            ),
 
                         lng:
-                            Number(result.lon),
+                            Number(
+                                result.lon
+                            ),
 
-                        isLocked: false
+                        isLocked:
+                            false
                     };
 
                     currentTrip.places.push(
@@ -1028,10 +1626,12 @@ if (!window.travelPlannerInitialized) {
 
                     if (!success) {
                         currentTrip.places.pop();
+
                         return;
                     }
 
-                    placeInput.value = '';
+                    placeInput.value =
+                        '';
 
                     renderPlaces();
 
@@ -1046,12 +1646,15 @@ if (!window.travelPlannerInitialized) {
                     );
 
                 } finally {
-                    addPlaceBtn.disabled = false;
+                    addPlaceBtn.disabled =
+                        false;
                 }
             }
-                        if (
+
+            if (
                 addPlaceBtn &&
-                addPlaceBtn.dataset.initialized !== 'true'
+                addPlaceBtn.dataset.initialized !==
+                    'true'
             ) {
                 addPlaceBtn.dataset.initialized =
                     'true';
@@ -1064,7 +1667,8 @@ if (!window.travelPlannerInitialized) {
 
             if (
                 placeInput &&
-                placeInput.dataset.initialized !== 'true'
+                placeInput.dataset.initialized !==
+                    'true'
             ) {
                 placeInput.dataset.initialized =
                     'true';
@@ -1072,8 +1676,12 @@ if (!window.travelPlannerInitialized) {
                 placeInput.addEventListener(
                     'keydown',
                     e => {
-                        if (e.key === 'Enter') {
+                        if (
+                            e.key ===
+                            'Enter'
+                        ) {
                             e.preventDefault();
+
                             addPlace();
                         }
                     }
@@ -1082,7 +1690,8 @@ if (!window.travelPlannerInitialized) {
 
             if (
                 placesList &&
-                placesList.dataset.initialized !== 'true'
+                placesList.dataset.initialized !==
+                    'true'
             ) {
                 placesList.dataset.initialized =
                     'true';
@@ -1097,7 +1706,8 @@ if (!window.travelPlannerInitialized) {
                                 '.dragging'
                             );
 
-                        if (!dragging) return;
+                        if (!dragging)
+                            return;
 
                         const after =
                             getDragAfterElement(
@@ -1133,28 +1743,35 @@ if (!window.travelPlannerInitialized) {
                     offset:
                         Number.NEGATIVE_INFINITY,
 
-                    element: null
+                    element:
+                        null
                 };
 
-                elements.forEach(child => {
-                    const box =
-                        child.getBoundingClientRect();
+                elements.forEach(
+                    child => {
+                        const box =
+                            child.getBoundingClientRect();
 
-                    const offset =
-                        y -
-                        box.top -
-                        box.height / 2;
+                        const offset =
+                            y -
+                            box.top -
+                            box.height /
+                                2;
 
-                    if (
-                        offset < 0 &&
-                        offset > closest.offset
-                    ) {
-                        closest = {
-                            offset,
-                            element: child
-                        };
+                        if (
+                            offset <
+                                0 &&
+                            offset >
+                                closest.offset
+                        ) {
+                            closest = {
+                                offset,
+                                element:
+                                    child
+                            };
+                        }
                     }
-                });
+                );
 
                 return closest.element;
             }
@@ -1175,17 +1792,24 @@ if (!window.travelPlannerInitialized) {
 
                 const reordered = [];
 
-                ids.forEach(id => {
-                    const found =
-                        currentTrip.places.find(
-                            p =>
-                                String(p.id) === id
-                        );
+                ids.forEach(
+                    id => {
+                        const found =
+                            currentTrip.places.find(
+                                p =>
+                                    String(
+                                        p.id
+                                    ) ===
+                                    id
+                            );
 
-                    if (found) {
-                        reordered.push(found);
+                        if (found) {
+                            reordered.push(
+                                found
+                            );
+                        }
                     }
-                });
+                );
 
                 if (
                     reordered.length ===
@@ -1202,7 +1826,8 @@ if (!window.travelPlannerInitialized) {
 
             if (
                 optimizeBtn &&
-                optimizeBtn.dataset.initialized !== 'true'
+                optimizeBtn.dataset.initialized !==
+                    'true'
             ) {
                 optimizeBtn.dataset.initialized =
                     'true';
@@ -1230,11 +1855,13 @@ if (!window.travelPlannerInitialized) {
 
                 const unlocked =
                     places.filter(
-                        p => !p.isLocked
+                        p =>
+                            !p.isLocked
                     );
 
                 if (
-                    unlocked.length < 2
+                    unlocked.length <
+                    2
                 ) {
                     alert(
                         '잠금 해제된 장소가 2개 이상 필요합니다.'
@@ -1244,25 +1871,33 @@ if (!window.travelPlannerInitialized) {
                 }
 
                 const unlockedCopy =
-                    [...unlocked];
+                    [
+                        ...unlocked
+                    ];
 
                 const result = [];
 
                 let current =
                     unlockedCopy.shift();
 
-                result.push(current);
+                result.push(
+                    current
+                );
 
                 while (
-                    unlockedCopy.length > 0
+                    unlockedCopy.length >
+                    0
                 ) {
-                    let nearestIndex = 0;
+                    let nearestIndex =
+                        0;
+
                     let nearestDistance =
                         Infinity;
 
                     for (
                         let i = 0;
-                        i < unlockedCopy.length;
+                        i <
+                        unlockedCopy.length;
                         i++
                     ) {
                         const distance =
@@ -1289,35 +1924,50 @@ if (!window.travelPlannerInitialized) {
                             1
                         )[0];
 
-                    result.push(current);
+                    result.push(
+                        current
+                    );
                 }
 
                 const finalRoute =
                     new Array(
                         places.length
-                    ).fill(null);
+                    ).fill(
+                        null
+                    );
 
                 places.forEach(
-                    (p, index) => {
-                        if (p.isLocked) {
-                            finalRoute[index] =
-                                p;
+                    (
+                        p,
+                        index
+                    ) => {
+                        if (
+                            p.isLocked
+                        ) {
+                            finalRoute[
+                                index
+                            ] = p;
                         }
                     }
                 );
 
-                let resultIndex = 0;
+                let resultIndex =
+                    0;
 
                 for (
                     let i = 0;
-                    i < finalRoute.length;
+                    i <
+                    finalRoute.length;
                     i++
                 ) {
                     if (
-                        finalRoute[i] === null
+                        finalRoute[i] ===
+                        null
                     ) {
                         finalRoute[i] =
-                            result[resultIndex++];
+                            result[
+                                resultIndex++
+                            ];
                     }
                 }
 
@@ -1350,31 +2000,44 @@ if (!window.travelPlannerInitialized) {
                     Number(b.lng);
 
                 if (
-                    !Number.isFinite(lat1) ||
-                    !Number.isFinite(lat2)
+                    !Number.isFinite(
+                        lat1
+                    ) ||
+                    !Number.isFinite(
+                        lat2
+                    )
                 ) {
                     return Infinity;
                 }
 
-                const R = 6371;
+                const R =
+                    6371;
 
                 const dLat =
                     toRad(
-                        lat2 - lat1
+                        lat2 -
+                            lat1
                     );
 
                 const dLng =
                     toRad(
-                        lng2 - lng1
+                        lng2 -
+                            lng1
                     );
 
                 const x =
-                    Math.sin(dLat / 2) ** 2 +
+                    Math.sin(
+                        dLat / 2
+                    ) ** 2 +
                     Math.cos(
-                        toRad(lat1)
+                        toRad(
+                            lat1
+                        )
                     ) *
                     Math.cos(
-                        toRad(lat2)
+                        toRad(
+                            lat2
+                        )
                     ) *
                     Math.sin(
                         dLng / 2
@@ -1384,13 +2047,19 @@ if (!window.travelPlannerInitialized) {
                     R *
                     2 *
                     Math.atan2(
-                        Math.sqrt(x),
-                        Math.sqrt(1 - x)
+                        Math.sqrt(
+                            x
+                        ),
+                        Math.sqrt(
+                            1 - x
+                        )
                     )
                 );
             }
 
-            function toRad(value) {
+            function toRad(
+                value
+            ) {
                 return (
                     value *
                     Math.PI /
@@ -1401,9 +2070,13 @@ if (!window.travelPlannerInitialized) {
             renderPlaces();
         }
 
-        function escapeHtml(value) {
+        function escapeHtml(
+            value
+        ) {
             const div =
-                document.createElement('div');
+                document.createElement(
+                    'div'
+                );
 
             div.textContent =
                 value ?? '';
