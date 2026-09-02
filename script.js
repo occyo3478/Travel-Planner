@@ -19,11 +19,14 @@ if (!window.travelPlannerInitialized) {
         let currentTrip = null;
 
         const isDetailPage = document.getElementById('map') && document.getElementById('places-list');
+        const isEditPage = document.getElementById('edit-btn');
         const isAddPage = document.getElementById('add-btn');
         const isIndexPage = document.getElementById('trip-list');
 
         if (isDetailPage) {
             initDetailPage();
+        } else if (isEditPage) {
+            initEditPage();
         } else if (isAddPage) {
             initAddPage();
         } else if (isIndexPage) {
@@ -420,7 +423,7 @@ if (!window.travelPlannerInitialized) {
                     if (editBtn) {
                         editBtn.addEventListener('click', event => {
                             event.stopPropagation();
-                            window.location.href = `trip_add.html?id=${encodeURIComponent(String(trip.id))}`;
+                            window.location.href = `trip_edit.html?id=${encodeURIComponent(String(trip.id))}`;
                         });
                     }
 
@@ -574,56 +577,7 @@ if (!window.travelPlannerInitialized) {
             const endDate = document.getElementById('end-date');
             const activity = document.getElementById('activity');
 
-            const params = new URLSearchParams(window.location.search);
-            const editId = params.get('id');
-            const isEditMode = Boolean(editId);
-
             let isSaving = false;
-
-            if (isEditMode) {
-                document.title = '일정 수정 - Travel Planner';
-
-                const headerTitle = document.querySelector('.add-page-header h1');
-
-                if (headerTitle) {
-                    headerTitle.textContent = '여행 계획 수정하기';
-                }
-
-                addBtn.innerHTML = '<i class="fa-solid fa-check"></i> 수정 내용 저장하기';
-
-                try {
-                    const doc = await db.collection('trips').doc(String(editId)).get();
-
-                    if (!doc.exists) {
-                        alert('수정할 여행 정보를 찾을 수 없습니다.');
-                        window.location.href = 'index.html';
-                        return;
-                    }
-
-                    const data = doc.data();
-
-                    if (destination) {
-                        destination.value = data.destination || data.name || '';
-                    }
-
-                    if (startDate) {
-                        startDate.value = data.startDate || data.date || '';
-                    }
-
-                    if (endDate) {
-                        endDate.value = data.endDate || data.startDate || data.date || '';
-                    }
-
-                    if (activity) {
-                        activity.value = data.activity || '';
-                    }
-                } catch (error) {
-                    console.error('여행 정보 불러오기 실패:', error);
-                    alert('여행 정보를 불러오지 못했습니다.');
-                    window.location.href = 'index.html';
-                    return;
-                }
-            }
 
             addBtn.addEventListener('click', async () => {
                 if (isSaving) {
@@ -652,19 +606,6 @@ if (!window.travelPlannerInitialized) {
                 addBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 저장 중...';
 
                 try {
-                    if (isEditMode) {
-                        await db.collection('trips').doc(String(editId)).update({
-                            destination: destinationValue,
-                            startDate: startValue,
-                            endDate: endValue,
-                            activity: activityValue
-                        });
-
-                        alert('여행 정보가 수정되었습니다.');
-                        window.location.href = 'index.html';
-                        return;
-                    }
-
                     const id = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
                     const newTrip = {
@@ -684,11 +625,115 @@ if (!window.travelPlannerInitialized) {
                     }
                 } catch (error) {
                     console.error('여행 정보 저장 실패:', error);
-                    alert(isEditMode ? '여행 정보 수정에 실패했습니다.' : '여행 저장에 실패했습니다.');
+                    alert('여행 저장에 실패했습니다.');
                 } finally {
                     isSaving = false;
                     addBtn.disabled = false;
                     addBtn.innerHTML = originalText;
+                }
+            });
+        }
+
+        async function initEditPage() {
+            const editBtn = document.getElementById('edit-btn');
+
+            if (!editBtn || editBtn.dataset.initialized === 'true') {
+                return;
+            }
+
+            editBtn.dataset.initialized = 'true';
+
+            const destination = document.getElementById('destination');
+            const startDate = document.getElementById('start-date');
+            const endDate = document.getElementById('end-date');
+            const activity = document.getElementById('activity');
+            const params = new URLSearchParams(window.location.search);
+            const tripId = params.get('id');
+
+            if (!tripId) {
+                alert('수정할 여행 ID가 없습니다.');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            let isSaving = false;
+
+            try {
+                const doc = await db.collection('trips').doc(String(tripId)).get();
+
+                if (!doc.exists) {
+                    alert('수정할 여행 정보를 찾을 수 없습니다.');
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                const data = doc.data();
+
+                if (destination) {
+                    destination.value = data.destination || data.name || '';
+                }
+
+                if (startDate) {
+                    startDate.value = data.startDate || data.date || '';
+                }
+
+                if (endDate) {
+                    endDate.value = data.endDate || data.startDate || data.date || '';
+                }
+
+                if (activity) {
+                    activity.value = data.activity || '';
+                }
+            } catch (error) {
+                console.error('여행 정보 불러오기 실패:', error);
+                alert('여행 정보를 불러오지 못했습니다.');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            editBtn.addEventListener('click', async () => {
+                if (isSaving) {
+                    return;
+                }
+
+                const destinationValue = destination ? destination.value.trim() : '';
+                const startValue = startDate ? startDate.value : '';
+                const endValue = endDate ? endDate.value : '';
+                const activityValue = activity ? activity.value.trim() : '';
+
+                if (!destinationValue || !startValue || !endValue) {
+                    alert('필수 정보를 입력해주세요.');
+                    return;
+                }
+
+                if (endValue < startValue) {
+                    alert('종료일은 시작일보다 빠를 수 없습니다.');
+                    return;
+                }
+
+                isSaving = true;
+                editBtn.disabled = true;
+
+                const originalText = editBtn.innerHTML;
+                editBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 저장 중...';
+
+                try {
+                    await db.collection('trips').doc(String(tripId)).update({
+                        destination: destinationValue,
+                        startDate: startValue,
+                        endDate: endValue,
+                        activity: activityValue
+                    });
+
+                    alert('여행 정보가 수정되었습니다.');
+                    window.location.href = 'index.html';
+                } catch (error) {
+                    console.error('여행 정보 수정 실패:', error);
+                    alert('여행 정보 수정에 실패했습니다.');
+                } finally {
+                    isSaving = false;
+                    editBtn.disabled = false;
+                    editBtn.innerHTML = originalText;
                 }
             });
         }
