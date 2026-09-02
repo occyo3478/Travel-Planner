@@ -204,8 +204,6 @@ if (!window.travelPlannerInitialized) {
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
 
-                let hasNotification = false;
-
                 const upcomingTrips = trips
                     .filter(trip => {
                         if (!trip.startDate) {
@@ -219,6 +217,11 @@ if (!window.travelPlannerInitialized) {
                     .sort((a, b) => {
                         return parseLocalDate(a.startDate) - parseLocalDate(b.startDate);
                     });
+
+                if (upcomingTrips.length === 0) {
+                    notificationList.innerHTML = '<li class="empty-noti">새로운 알림이 없습니다.</li>';
+                    return;
+                }
 
                 upcomingTrips.forEach(trip => {
                     const startDate = parseLocalDate(trip.startDate);
@@ -258,14 +261,7 @@ if (!window.travelPlannerInitialized) {
                     });
 
                     notificationList.appendChild(li);
-                    hasNotification = true;
                 });
-
-                if (!hasNotification) {
-                    notificationList.innerHTML = `
-                        <li class="empty-noti">새로운 알림이 없습니다.</li>
-                    `;
-                }
             }
 
             tabBtns.forEach(btn => {
@@ -422,9 +418,9 @@ if (!window.travelPlannerInitialized) {
                     const editBtn = card.querySelector('.edit-trip-btn');
 
                     if (editBtn) {
-                        editBtn.addEventListener('click', async event => {
+                        editBtn.addEventListener('click', event => {
                             event.stopPropagation();
-                            await editTripInfo(trip);
+                            window.location.href = `trip_add.html?id=${encodeURIComponent(String(trip.id))}`;
                         });
                     }
 
@@ -443,120 +439,6 @@ if (!window.travelPlannerInitialized) {
 
                     tripList.appendChild(card);
                 });
-            }
-
-            async function editTripInfo(trip) {
-                if (!trip) {
-                    return;
-                }
-
-                const newName = prompt(
-                    '여행 이름을 수정해주세요.',
-                    trip.destination || ''
-                );
-
-                if (newName === null) {
-                    return;
-                }
-
-                const trimmedName = newName.trim();
-
-                if (!trimmedName) {
-                    alert('여행 이름을 입력해주세요.');
-                    return;
-                }
-
-                const newStartDate = prompt(
-                    '여행 시작일을 수정해주세요.\n예: 2026-09-10',
-                    trip.startDate || ''
-                );
-
-                if (newStartDate === null) {
-                    return;
-                }
-
-                const trimmedStartDate = newStartDate.trim();
-
-                if (!trimmedStartDate) {
-                    alert('시작일을 입력해주세요.');
-                    return;
-                }
-
-                const newEndDate = prompt(
-                    '여행 종료일을 수정해주세요.\n예: 2026-09-12',
-                    trip.endDate || ''
-                );
-
-                if (newEndDate === null) {
-                    return;
-                }
-
-                const trimmedEndDate = newEndDate.trim();
-
-                if (!trimmedEndDate) {
-                    alert('종료일을 입력해주세요.');
-                    return;
-                }
-
-                const startDate = parseLocalDate(trimmedStartDate);
-                const endDate = parseLocalDate(trimmedEndDate);
-
-                if (
-                    Number.isNaN(startDate.getTime()) ||
-                    Number.isNaN(endDate.getTime())
-                ) {
-                    alert('날짜 형식이 올바르지 않습니다.\nYYYY-MM-DD 형식으로 입력해주세요.');
-                    return;
-                }
-
-                if (endDate < startDate) {
-                    alert('종료일은 시작일보다 빠를 수 없습니다.');
-                    return;
-                }
-
-                const newActivity = prompt(
-                    '주요 활동을 수정해주세요.\n비워두면 주요 활동이 삭제됩니다.',
-                    trip.activity || ''
-                );
-
-                if (newActivity === null) {
-                    return;
-                }
-
-                const trimmedActivity = newActivity.trim();
-
-                if (
-                    trimmedName === (trip.destination || '') &&
-                    trimmedStartDate === (trip.startDate || '') &&
-                    trimmedEndDate === (trip.endDate || '') &&
-                    trimmedActivity === (trip.activity || '')
-                ) {
-                    return;
-                }
-
-                try {
-                    await db.collection('trips').doc(String(trip.id)).update({
-                        destination: trimmedName,
-                        startDate: trimmedStartDate,
-                        endDate: trimmedEndDate,
-                        activity: trimmedActivity
-                    });
-
-                    trip.destination = trimmedName;
-                    trip.startDate = trimmedStartDate;
-                    trip.endDate = trimmedEndDate;
-                    trip.activity = trimmedActivity;
-
-                    renderTrips();
-                    updateStats();
-                    renderNotifications();
-
-                    console.log('여행 정보 수정 완료:', trip.id);
-                    alert('여행 정보가 수정되었습니다.');
-                } catch (error) {
-                    console.error('여행 정보 수정 실패:', error);
-                    alert('여행 정보 수정에 실패했습니다.');
-                }
             }
 
             async function deleteTrip(id) {
@@ -678,7 +560,7 @@ if (!window.travelPlannerInitialized) {
             }
         }
 
-        function initAddPage() {
+        async function initAddPage() {
             const addBtn = document.getElementById('add-btn');
 
             if (!addBtn || addBtn.dataset.initialized === 'true') {
@@ -692,7 +574,56 @@ if (!window.travelPlannerInitialized) {
             const endDate = document.getElementById('end-date');
             const activity = document.getElementById('activity');
 
+            const params = new URLSearchParams(window.location.search);
+            const editId = params.get('id');
+            const isEditMode = Boolean(editId);
+
             let isSaving = false;
+
+            if (isEditMode) {
+                document.title = '일정 수정 - Travel Planner';
+
+                const headerTitle = document.querySelector('.add-page-header h1');
+
+                if (headerTitle) {
+                    headerTitle.textContent = '여행 계획 수정하기';
+                }
+
+                addBtn.innerHTML = '<i class="fa-solid fa-check"></i> 수정 내용 저장하기';
+
+                try {
+                    const doc = await db.collection('trips').doc(String(editId)).get();
+
+                    if (!doc.exists) {
+                        alert('수정할 여행 정보를 찾을 수 없습니다.');
+                        window.location.href = 'index.html';
+                        return;
+                    }
+
+                    const data = doc.data();
+
+                    if (destination) {
+                        destination.value = data.destination || data.name || '';
+                    }
+
+                    if (startDate) {
+                        startDate.value = data.startDate || data.date || '';
+                    }
+
+                    if (endDate) {
+                        endDate.value = data.endDate || data.startDate || data.date || '';
+                    }
+
+                    if (activity) {
+                        activity.value = data.activity || '';
+                    }
+                } catch (error) {
+                    console.error('여행 정보 불러오기 실패:', error);
+                    alert('여행 정보를 불러오지 못했습니다.');
+                    window.location.href = 'index.html';
+                    return;
+                }
+            }
 
             addBtn.addEventListener('click', async () => {
                 if (isSaving) {
@@ -720,24 +651,40 @@ if (!window.travelPlannerInitialized) {
                 const originalText = addBtn.innerHTML;
                 addBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 저장 중...';
 
-                const id = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-
-                const newTrip = {
-                    id,
-                    destination: destinationValue,
-                    startDate: startValue,
-                    endDate: endValue,
-                    activity: activityValue,
-                    places: []
-                };
-
                 try {
-                    const success = await saveTrip(newTrip);
+                    if (isEditMode) {
+                        await db.collection('trips').doc(String(editId)).update({
+                            destination: destinationValue,
+                            startDate: startValue,
+                            endDate: endValue,
+                            activity: activityValue
+                        });
 
-                    if (success) {
+                        alert('여행 정보가 수정되었습니다.');
                         window.location.href = 'index.html';
                         return;
                     }
+
+                    const id = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+
+                    const newTrip = {
+                        id,
+                        destination: destinationValue,
+                        startDate: startValue,
+                        endDate: endValue,
+                        activity: activityValue,
+                        places: []
+                    };
+
+                    const success = await saveTrip(newTrip);
+
+                    if (success) {
+                        alert('여행이 추가되었습니다.');
+                        window.location.href = 'index.html';
+                    }
+                } catch (error) {
+                    console.error('여행 정보 저장 실패:', error);
+                    alert(isEditMode ? '여행 정보 수정에 실패했습니다.' : '여행 저장에 실패했습니다.');
                 } finally {
                     isSaving = false;
                     addBtn.disabled = false;
