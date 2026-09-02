@@ -423,7 +423,7 @@ if (!window.travelPlannerInitialized) {
                     if (editBtn) {
                         editBtn.addEventListener('click', event => {
                             event.stopPropagation();
-                            window.location.href = `trip_edit.html?id=${encodeURIComponent(String(trip.id))}`;
+                            window.location.href = `edit.html?id=${encodeURIComponent(String(trip.id))}`;
                         });
                     }
 
