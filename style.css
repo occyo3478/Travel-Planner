@@ -1522,4 +1522,8 @@ select {
         padding: 15px 20px;
     }
 }
+   .trip-card.ongoing-trip {
+    background: #C7E9FF;
+    border-left: 4px solid #5BB7F5;
+}
 }
