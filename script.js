@@ -237,10 +237,6 @@ if (!window.travelPlannerInitialized) {
                         (1000 * 60 * 60 * 24)
                     );
 
-                    if (dDay < 0) {
-                        return;
-                    }
-
                     const li = document.createElement('li');
                     li.className = 'notification-item';
 
@@ -254,7 +250,7 @@ if (!window.travelPlannerInitialized) {
                                 </div>
                             </div>
                         `;
-                    } else {
+                    } else if (dDay > 0) {
                         li.innerHTML = `
                             <div class="noti-content">
                                 <span class="d-day-badge d-day-upcoming">D-${dDay}</span>
@@ -272,10 +268,6 @@ if (!window.travelPlannerInitialized) {
 
                     notificationList.appendChild(li);
                 });
-
-                if (!notificationList.children.length) {
-                    notificationList.innerHTML = '<li class="empty-noti">새로운 알림이 없습니다.</li>';
-                }
             }
 
             tabBtns.forEach(btn => {
@@ -395,7 +387,18 @@ if (!window.travelPlannerInitialized) {
                 });
 
                 filtered.sort((a, b) => {
-                    return parseLocalDate(a.startDate) - parseLocalDate(b.startDate);
+                    const aStart = parseLocalDate(a.startDate);
+                    const bStart = parseLocalDate(b.startDate);
+                    const aEnd = parseLocalDate(a.endDate);
+                    const bEnd = parseLocalDate(b.endDate);
+                    const aOngoing = currentTab === 'upcoming' && aStart <= today && aEnd >= today;
+                    const bOngoing = currentTab === 'upcoming' && bStart <= today && bEnd >= today;
+
+                    if (aOngoing !== bOngoing) {
+                        return aOngoing ? -1 : 1;
+                    }
+
+                    return aStart - bStart;
                 });
 
                 if (currentTab === 'past') {
@@ -416,7 +419,11 @@ if (!window.travelPlannerInitialized) {
 
                 filtered.forEach(trip => {
                     const card = document.createElement('div');
-                    card.className = 'trip-card';
+                    const start = parseLocalDate(trip.startDate);
+                    const end = parseLocalDate(trip.endDate);
+                    const isOngoing = currentTab === 'upcoming' && start <= today && end >= today;
+
+                    card.className = isOngoing ? 'trip-card ongoing-trip' : 'trip-card';
 
                     card.innerHTML = `
                         <div class="trip-info">
@@ -484,11 +491,13 @@ if (!window.travelPlannerInitialized) {
 
                 const upcoming = trips.filter(trip => {
                     const date = parseLocalDate(trip.endDate);
+
                     return !Number.isNaN(date.getTime()) && date >= today;
                 }).length;
 
                 const past = trips.filter(trip => {
                     const date = parseLocalDate(trip.endDate);
+
                     return !Number.isNaN(date.getTime()) && date < today;
                 }).length;
 
