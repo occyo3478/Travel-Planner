@@ -237,6 +237,10 @@ if (!window.travelPlannerInitialized) {
                         (1000 * 60 * 60 * 24)
                     );
 
+                    if (dDay < 0) {
+                        return;
+                    }
+
                     const li = document.createElement('li');
                     li.className = 'notification-item';
 
@@ -250,23 +254,13 @@ if (!window.travelPlannerInitialized) {
                                 </div>
                             </div>
                         `;
-                    } else if (dDay > 0) {
+                    } else {
                         li.innerHTML = `
                             <div class="noti-content">
                                 <span class="d-day-badge d-day-upcoming">D-${dDay}</span>
                                 <div class="noti-text">
                                     <strong>${escapeHtml(trip.destination || '여행')}</strong>
                                     <p>여행 시작까지 <strong>D-${dDay}</strong></p>
-                                </div>
-                            </div>
-                        `;
-                    } else {
-                        li.innerHTML = `
-                            <div class="noti-content">
-                                <span class="d-day-badge d-day-today">진행중</span>
-                                <div class="noti-text">
-                                    <strong>${escapeHtml(trip.destination || '여행')}</strong>
-                                    <p>현재 여행이 진행 중입니다! ✈️</p>
                                 </div>
                             </div>
                         `;
@@ -278,6 +272,10 @@ if (!window.travelPlannerInitialized) {
 
                     notificationList.appendChild(li);
                 });
+
+                if (!notificationList.children.length) {
+                    notificationList.innerHTML = '<li class="empty-noti">새로운 알림이 없습니다.</li>';
+                }
             }
 
             tabBtns.forEach(btn => {
@@ -420,18 +418,9 @@ if (!window.travelPlannerInitialized) {
                     const card = document.createElement('div');
                     card.className = 'trip-card';
 
-                    const start = parseLocalDate(trip.startDate);
-                    const end = parseLocalDate(trip.endDate);
-
-                    let statusText = '';
-
-                    if (start <= today && end >= today) {
-                        statusText = '<span class="trip-status">진행중</span>';
-                    }
-
                     card.innerHTML = `
                         <div class="trip-info">
-                            <h3>${escapeHtml(trip.destination)} ${statusText}</h3>
+                            <h3>${escapeHtml(trip.destination)}</h3>
                             <p>${escapeHtml(trip.startDate)} ~ ${escapeHtml(trip.endDate)}</p>
                         </div>
                         <div class="trip-card-actions">
@@ -495,13 +484,11 @@ if (!window.travelPlannerInitialized) {
 
                 const upcoming = trips.filter(trip => {
                     const date = parseLocalDate(trip.endDate);
-
                     return !Number.isNaN(date.getTime()) && date >= today;
                 }).length;
 
                 const past = trips.filter(trip => {
                     const date = parseLocalDate(trip.endDate);
-
                     return !Number.isNaN(date.getTime()) && date < today;
                 }).length;
 
